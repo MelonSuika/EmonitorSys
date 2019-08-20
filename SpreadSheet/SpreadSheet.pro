@@ -26,19 +26,20 @@ CONFIG += c++11
 
 INCLUDEPATH += \
         ./spreadsheet/include   \
-        ./terminal
+        ./terminal  \
+        ./include   \
 
 SOURCES += \
-    chartform.cpp \
-    common.cpp \
-    dashboardform.cpp \
-    dashboardtabwidget.cpp \
-    datasheetform.cpp \
-        main.cpp \
-        mainwindow.cpp \
-    rtchartform.cpp \
-    rtdatasheetform.cpp \
-    serialportinfo.cpp \
+    ./source/chartform.cpp \
+    ./source/common.cpp \
+    ./source/dashboardform.cpp \
+    ./source/dashboardtabwidget.cpp \
+    ./source/datasheetform.cpp \
+        ./source/main.cpp \
+        ./source/mainwindow.cpp \
+    ./source/rtchartform.cpp \
+    ./source/rtdatasheetform.cpp \
+    ./source/serialportinfo.cpp \
         spreadsheet/source/printview.cpp \
         spreadsheet/source/spreadsheet.cpp \
         spreadsheet/source/spreadsheetdelegate.cpp \
@@ -46,29 +47,29 @@ SOURCES += \
         #terminal/console.cpp
 
 HEADERS += \
-    chartform.h \
-    common.h \
-        connection.h \
-    dashboardform.h \
-    dashboardtabwidget.h \
-    datasheetform.h \
-        mainwindow.h \
-    rtchartform.h \
-    rtdatasheetform.h \
-    serialportinfo.h \
+    ./include/chartform.h \
+    ./include/common.h \
+        ./include/connection.h \
+    ./include/dashboardform.h \
+    ./include/dashboardtabwidget.h \
+    ./include/datasheetform.h \
+        ./include/mainwindow.h \
+    ./include/rtchartform.h \
+    ./include/rtdatasheetform.h \
+    ./include/serialportinfo.h \
         spreadsheet/include/printview.h \
         spreadsheet/include/spreadsheet.h \
         spreadsheet/include/spreadsheetdelegate.h \
         spreadsheet/include/spreadsheetitem.h   \
 
 FORMS += \
-        chartform.ui \
-        dashboardform.ui \
-        dashboardtabwidget.ui \
-        datasheetform.ui \
-        mainwindow.ui \
-        rtchartform.ui \
-        rtdatasheetform.ui
+        ./ui/chartform.ui \
+        ./ui/dashboardform.ui \
+        ./ui/dashboardtabwidget.ui \
+        ./ui/datasheetform.ui \
+        ./ui/mainwindow.ui \
+        ./ui/rtchartform.ui \
+        ./ui/rtdatasheetform.ui
 
 #打印支持
 QT += printsupport
@@ -107,5 +108,5 @@ DISTFILES += \
 
 RESOURCES += \
     dialcontrol/dialcontrol.qrc \
-    mainwindow.qrc
+    ./qrc/mainwindow.qrc
 

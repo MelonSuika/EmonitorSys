@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>image/lanso.png</file>
-        <file>qss/widget-blue.qss</file>
-        <file>qss/widget-black.qss</file>
-    </qresource>
-</RCC>
