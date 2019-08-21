@@ -83,9 +83,7 @@ void MainWindow::errorFunc(QSerialPort::SerialPortError err)
     {
         qDebug()<<"串口拔出";
     }
-
 }
-
 
 
 /*
@@ -184,7 +182,7 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
         {
             unsigned short wCrc = 0;
             QByteArray abyd;
-            unsigned char d[8] = {0x00, 0x03, 0xff, 0x00, 0x00, 0x01};
+            unsigned char d[8] = TH_CHK_ADDR(0x00, 0x01);
             wCrc = Get_CRC(d, 6);
             d[7] = (wCrc&0xff00)>>8;
             d[6] = (wCrc&0x00ff);
@@ -229,7 +227,7 @@ void MainWindow::readData()
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         SerialPortInfo *serialPortInfo = &m_pComlist->operator[](i);
         /* 如果是第一次查询地址后的第一次读取，需要判断缓存是否等于7 */
-        if (serial->bytesAvailable() != 7 && serialPortInfo->m_isChkAdrCmd == true)
+        if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() != 7)
         {
             serialPortInfo->m_nWaitSerialCnt++;
             return;
@@ -267,9 +265,16 @@ void MainWindow::readData()
             {
                 qDebug() << "inserted value 1,25,25!";
             }
-        }
 
-        emit sendRtData(tOut);
+            /* 温湿度数据插入数据库后，发送信号更新表盘 */
+            emit sendRtData(tOut);
+        }
+        /* 读到的是设备地址 */
+        else
+        {
+            serialPortInfo->m_abyAddr[0] = data[3];
+            serialPortInfo->m_abyAddr[1] = data[4];
+        }
 
         serialPortInfo->m_nWaitSerialCnt = 0;
         serialPortInfo->m_isChkAdrCmd = false;
@@ -282,16 +287,18 @@ void MainWindow::readData()
 
 void MainWindow::SendMsgFunc()
 {
+    ui->textEditTest->append("11");
     for (int i = 0; i < m_pComlist->size(); i++)
     {
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         unsigned short wCrc = 0;
         QByteArray abyd;
-        uchar d[8] = {0xff, 0x03, 0x00, 0x00, 0x00, 0x02};
+        abyd.resize(8);
+        //uchar d[8] = {0xff, 0x03, 0x00, 0x00, 0x00, 0x02};
+        uchar d[8] = TH_CHK_DATA((uchar)m_pComlist->at(i).m_abyAddr[1], 2);
         wCrc = Get_CRC(d, 6);
         d[7] = (wCrc&0xff00)>>8;
         d[6] = (wCrc&0x00ff);
-        abyd.resize(8);
         for (int i = 0; i < 8; i++)
         {
             abyd[i] = d[i];
@@ -310,11 +317,17 @@ void MainWindow::SendMsgFunc()
 void MainWindow::on_pushButtonReadData_clicked()
 {
     isRunFlag = !isRunFlag;
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(SendMsgFunc()));
-    m_timer->start(5*1000);
     if (m_timer->isActive())
     {
-        ui->textEditTest->setText("active");
+        disconnect(m_timer, SIGNAL(timeout()), this, SLOT(SendMsgFunc()));
+        m_timer->stop();
+        ui->textEditTest->append("定时读取关闭");
+    }
+    else
+    {
+        connect(m_timer, SIGNAL(timeout()), this, SLOT(SendMsgFunc()));
+        m_timer->start(5*1000);
+        ui->textEditTest->append("定时读取开启");
     }
 
 }

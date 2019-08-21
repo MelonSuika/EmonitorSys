@@ -16,6 +16,9 @@ public:
     int m_nWaitSerialCnt;       /* 缓存区数据不够计数 */
     bool m_isChkAdrCmd;         /* 查询地址命令 */
 
+    QByteArray m_abyAddr;          /* 设备地址 */
+
+
     int m_nDeviceType;
 
 private slots:

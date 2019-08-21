@@ -29,5 +29,7 @@
 #include "rtchartform.h"
 
 
+#define TH_CHK_ADDR(addr, count) {addr, 0x03, 0xff, 0x00, 0x00, count}
+#define TH_CHK_DATA(addr, count) {addr, 0x03, 0x00, 0x00, 0x00, count}
 
 #endif // COMMON_H
