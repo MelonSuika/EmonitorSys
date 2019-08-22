@@ -35,9 +35,7 @@ DashBoardForm::DashBoardForm(QWidget *parent) :
 
     /* 数据交互  */
     m_person = 80;
-    qDebug()<<"aaa";
     m_quickWidget->engine()->rootContext()->setContextProperty("person", m_person);
-    qDebug()<<"bbbb";
 
     ui->gridLayout->setColumnStretch(0, 7);
     ui->gridLayout->setColumnStretch(1, 3);

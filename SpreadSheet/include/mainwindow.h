@@ -44,17 +44,15 @@ private slots:
 
     void SendMsgFunc();
 
-    void on_pushButtonGageStatus_clicked();
-
     void on_pushButtonConnectInfo_clicked();
-
-    void on_pushButton_clicked();
 
     void on_pushButtonChartStatus_clicked();
 
     void on_pushButton_dashBoard_clicked();
 
     void on_pushButtonAllSheet_clicked();
+
+    void on_pushButton_setDeviceType_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -40,6 +40,7 @@ SOURCES += \
     ./source/rtchartform.cpp \
     ./source/rtdatasheetform.cpp \
     ./source/serialportinfo.cpp \
+    ./source/setdevicetypeform.cpp \
         spreadsheet/source/printview.cpp \
         spreadsheet/source/spreadsheet.cpp \
         spreadsheet/source/spreadsheetdelegate.cpp \
@@ -57,6 +58,7 @@ HEADERS += \
     ./include/rtchartform.h \
     ./include/rtdatasheetform.h \
     ./include/serialportinfo.h \
+    ./include/setdevicetypeform.h \
         spreadsheet/include/printview.h \
         spreadsheet/include/spreadsheet.h \
         spreadsheet/include/spreadsheetdelegate.h \
@@ -69,7 +71,8 @@ FORMS += \
         ./ui/datasheetform.ui \
         ./ui/mainwindow.ui \
         ./ui/rtchartform.ui \
-        ./ui/rtdatasheetform.ui
+        ./ui/rtdatasheetform.ui \
+        ./ui/setdevicetypeform.ui
 
 #打印支持
 QT += printsupport

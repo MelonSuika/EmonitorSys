@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>731</width>
-    <height>430</height>
+    <width>840</width>
+    <height>570</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>600</width>
-    <height>400</height>
+    <width>840</width>
+    <height>570</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -118,7 +118,7 @@
            </font>
           </property>
           <property name="title">
-           <string>操作</string>
+           <string/>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
@@ -131,52 +131,77 @@
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
-               <widget class="QPushButton" name="pushButtonSerial">
-                <property name="text">
-                 <string>打开串口</string>
+               <widget class="QGroupBox" name="groupBox_3">
+                <property name="title">
+                 <string>操作</string>
                 </property>
+                <layout class="QVBoxLayout" name="verticalLayout_3">
+                 <item>
+                  <widget class="QPushButton" name="pushButtonSerial">
+                   <property name="text">
+                    <string>打开串口</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButtonWriteSerialPort">
+                   <property name="text">
+                    <string>串口写数据</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButtonReadData">
+                   <property name="text">
+                    <string>定时读数据</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_setDeviceType">
+                   <property name="text">
+                    <string>设置表类型</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButtonWriteSerialPort">
-                <property name="text">
-                 <string>串口写数据</string>
+               <widget class="QGroupBox" name="groupBox_2">
+                <property name="title">
+                 <string>数据查看</string>
                 </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButtonReadData">
-                <property name="text">
-                 <string>定时读数据</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButtonSheet">
-                <property name="text">
-                 <string>查看历史数据</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButtonChartStatus">
-                <property name="text">
-                 <string>查看数据图</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButtonAllSheet">
-                <property name="text">
-                 <string>查看数据表</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_dashBoard">
-                <property name="text">
-                 <string>表盘实时查看</string>
-                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_2">
+                 <item>
+                  <widget class="QPushButton" name="pushButtonSheet">
+                   <property name="text">
+                    <string>查看历史数据</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButtonChartStatus">
+                   <property name="text">
+                    <string>查看数据图</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButtonAllSheet">
+                   <property name="text">
+                    <string>查看数据表</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_dashBoard">
+                   <property name="text">
+                    <string>实时查看</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
               <item>
@@ -239,6 +264,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="../qrc/mainwindow.qrc"/>
   <include location="../qrc/mainwindow.qrc"/>
   <include location="../qrc/mainwindow.qrc"/>
  </resources>

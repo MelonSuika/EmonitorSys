@@ -10,6 +10,7 @@
 #include <QtQuickWidgets/QQuickWidget>
 #include "chartform.h"
 #include "datasheetform.h"
+#include "setdevicetypeform.h"
 #include <memory>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -202,6 +203,10 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
             ui->textEditTest->setText("串口 " + serial->portName() + " 未打开");
         }
     }
+    if (m_pComlist->size() == 0)
+    {
+        ui->textEditTest->append("无串口连接");
+    }
 }
 
 /*
@@ -287,7 +292,6 @@ void MainWindow::readData()
 
 void MainWindow::SendMsgFunc()
 {
-    ui->textEditTest->append("11");
     for (int i = 0; i < m_pComlist->size(); i++)
     {
         QSerialPort *serial = m_pComlist->at(i).m_serial;
@@ -331,22 +335,14 @@ void MainWindow::on_pushButtonReadData_clicked()
     }
 
 }
+
 /*
-    函数功能:查看选择表的状态
+    函数功能:显示串口连接信息
 */
-void MainWindow::on_pushButtonGageStatus_clicked()
-{
-    /*QUrl source("dialcontrol.qml");
-    QQuickView *view = new QQuickView;
-    view->setResizeMode(QQuickView::SizeRootObjectToView);
-    view->setSource(QUrl(QStringLiteral("qrc:/dialcontrol.qml")));
-    view->show();*/
-
-}
-
 void MainWindow::on_pushButtonConnectInfo_clicked()
 {
     ui->textEditDebug->append(QDateTime::currentDateTime().toString());
+    ui->textEditDebug->append("COM连接数:" + QString::number(QSerialPortInfo::availablePorts().size()));
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
     {
         ui->textEditDebug->append("Name:" + info.portName());
@@ -355,13 +351,6 @@ void MainWindow::on_pushButtonConnectInfo_clicked()
         ui->textEditDebug->append("Serial Number: " + info.serialNumber());
         ui->textEditDebug->append("System Location: " + info.systemLocation());
     }
-}
-
-void MainWindow::on_pushButton_clicked()
-{
-
-
-
 }
 
 /*
@@ -409,3 +398,14 @@ void MainWindow::on_pushButtonAllSheet_clicked()
 
 }
 
+/*
+    函数功能:人工设置表类型
+*/
+void MainWindow::on_pushButton_setDeviceType_clicked()
+{
+
+    SetDeviceTypeForm *setForm = new SetDeviceTypeForm();
+    setForm->show();
+
+
+}

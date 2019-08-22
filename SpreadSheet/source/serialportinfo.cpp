@@ -32,7 +32,6 @@ void SerialPortInfo::errorFunc(QSerialPort::SerialPortError error)
 {
     if (m_serial->error() ==  QSerialPort::ResourceError)
     {
-        //ui->textEditTest->setText("串口拔出");
         qDebug()<<m_serial->portName()<<"拔出";
     }
 

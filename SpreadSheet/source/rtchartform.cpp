@@ -19,11 +19,6 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_Series = new QLineSeries;
     m_Series->setPen(QPen(Qt::blue,1,Qt::SolidLine)); //设置画笔
 
-#if 0
-    *m_Series << QPointF(1, 5) << QPointF(3, 7) << QPointF(7, 6) << QPointF(9, 7) << QPointF(12, 6)
-            << QPointF(16, 7) << QPointF(18, 5);
-#endif
-
     m_Chart = new QChart;
     m_Chart->addSeries(m_Series);
     //m_Chart->legend()->hide();
