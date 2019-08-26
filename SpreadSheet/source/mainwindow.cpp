@@ -45,7 +45,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
         //这里相当于自动识别串口号之后添加到了cmb，如果要手动选择可以用下面列表的方式添加进去
         serialPortInfo.m_serial->setPort(info);
-
         if(serialPortInfo.m_serial->open(QIODevice::ReadWrite))
         {
             m_pComlist->append(serialPortInfo);
@@ -54,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent) :
             //关闭串口等待人为(打开串口按钮)打开
             serialPortInfo.m_serial->close();
             connect(serialPortInfo.m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
-            connect(serialPortInfo.m_serial, SIGNAL(QSerialPort::errorOccurred(QSerialPort::SerialPortError)), this, SLOT(MainWindow::errorFunc(QSerialPort::SerialPortError)));
+            //connect(serialPortInfo.m_serial, SIGNAL(QSerialPort::errorOccurred(QSerialPort::SerialPortError)), this, SLOT(MainWindow::errorFunc(QSerialPort::SerialPortError)));
             m_nComCount++;
         }
     }
@@ -66,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dBwdgt = nullptr;
     m_sheetForm = nullptr;
     m_chartForm = nullptr;
+    m_setForm = nullptr;
 }
 
 
@@ -176,7 +176,7 @@ unsigned short Get_CRC(uchar *pBuf, int len)
 void MainWindow::on_pushButtonWriteSerialPort_clicked()
 {
     for (int i = 0; i < m_pComlist->size(); i++)
-    {
+    {       
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         m_pComlist->operator[](i).m_isChkAdrCmd = true;
         if (serial->isOpen())
@@ -196,7 +196,7 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
             {
                 serial->write(abyd);
             }
-            ui->textEditTest->setText(serial->portName() + ": " + abyd.toHex());
+            ui->textEditTest->append(serial->portName() + ": " + abyd.toHex());
         }
         else
         {
@@ -226,8 +226,10 @@ void analysisTH(QByteArray dataIn, int &tOut, int &hOut)
 void MainWindow::readData()
 {
 
+
     for (int i = 0; i < m_pComlist->size(); i++)
     {
+
         int tOut = -1, hOut = -1;
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         SerialPortInfo *serialPortInfo = &m_pComlist->operator[](i);
@@ -235,13 +237,13 @@ void MainWindow::readData()
         if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() != 7)
         {
             serialPortInfo->m_nWaitSerialCnt++;
-            return;
+            continue;
         }
         /* 如果不是查询后的第一次读取，那就是温湿度读取，判断是否大于9 */
         if (serialPortInfo->m_isChkAdrCmd == false && serial->bytesAvailable() != 9)
         {
             serialPortInfo->m_nWaitSerialCnt++;
-            return;
+            continue;
         }
 
         const QByteArray data = serial->readAll();
@@ -251,34 +253,37 @@ void MainWindow::readData()
 
             /*
                 数据库中以表为组织单位存储数据
-                表类似我们的Java类，每个字段都有对应的数据类型。
-                那么用我们熟悉的java程序来与关系型数据对比，就会发现以下对应关系。
+                表类似我们的类，每个字段都有对应的数据类型。
                 类----------表
                 类中属性----------表中字段
                 对象----------记录
-
             */
-            analysisTH(data, tOut, hOut);
-            ui->textEditTest->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100) + "湿度:" + QString::number(hOut/100) + "." + QString::number(hOut%100));
-            ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
-            /* 插入数据库 */
-            if(!m_sqlQuery.exec("INSERT INTO TH3 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(tOut) + ", " + QString::number(hOut) +  ")"))
-            {
-                qDebug() << m_sqlQuery.lastError();
-            }
-            else
-            {
-                qDebug() << "inserted value 1,25,25!";
-            }
 
-            /* 温湿度数据插入数据库后，发送信号更新表盘 */
-            emit sendRtData(tOut);
+            if (serialPortInfo->m_nDeviceType == THC)
+            {
+                analysisTH(data, tOut, hOut);
+                ui->textEditTest->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100) + "湿度:" + QString::number(hOut/100) + "." + QString::number(hOut%100));
+                ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+                /* 插入数据库 */
+                if(!m_sqlQuery.exec("INSERT INTO TH3 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(tOut) + ", " + QString::number(hOut) +  ")"))
+                {
+                    qDebug() << m_sqlQuery.lastError();
+                }
+                else
+                {
+                    qDebug() << "inserted value 1,25,25!";
+                }
+
+                /* 温湿度数据插入数据库后，发送信号更新表盘 */
+                emit sendRtData(tOut);
+            }
         }
         /* 读到的是设备地址 */
         else
         {
             serialPortInfo->m_abyAddr[0] = data[3];
             serialPortInfo->m_abyAddr[1] = data[4];
+            ui->textEditTest->append("读取设备地址成功");
         }
 
         serialPortInfo->m_nWaitSerialCnt = 0;
@@ -298,7 +303,6 @@ void MainWindow::SendMsgFunc()
         unsigned short wCrc = 0;
         QByteArray abyd;
         abyd.resize(8);
-        //uchar d[8] = {0xff, 0x03, 0x00, 0x00, 0x00, 0x02};
         uchar d[8] = TH_CHK_DATA((uchar)m_pComlist->at(i).m_abyAddr[1], 2);
         wCrc = Get_CRC(d, 6);
         d[7] = (wCrc&0xff00)>>8;
@@ -403,9 +407,10 @@ void MainWindow::on_pushButtonAllSheet_clicked()
 */
 void MainWindow::on_pushButton_setDeviceType_clicked()
 {
-
-    SetDeviceTypeForm *setForm = new SetDeviceTypeForm();
-    setForm->show();
-
-
+    if (m_setForm == nullptr)
+    {
+        m_setForm = new SetDeviceTypeForm();
+    }
+    m_setForm->show();
+    m_setForm->Create(m_pComlist);
 }

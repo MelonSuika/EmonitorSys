@@ -15,7 +15,7 @@ SerialPortInfo::SerialPortInfo():
     m_serial = new QSerialPort();
     m_serialInfo = new QSerialPortInfo();
 
-    m_nDeviceType = 0;
+    m_nDeviceType = TYPE_NONE;
 
     m_abyAddr.resize(2);
     //connect(m_serial, SIGNAL(QSerialPort::errorOccurred()), this, SLOT(SerialPortInfo::errorFunc()));

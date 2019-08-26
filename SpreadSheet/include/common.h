@@ -32,4 +32,18 @@
 #define TH_CHK_ADDR(addr, count) {addr, 0x03, 0xff, 0x00, 0x00, count}
 #define TH_CHK_DATA(addr, count) {addr, 0x03, 0x00, 0x00, 0x00, count}
 
+
+enum DeviceType{
+
+    TYPE_NONE = 0,
+    ZMJ100P = 1,
+    ZMJ60XD,
+    ZMJ100PR,
+    HM100PR,
+    ZMJ100PRO,
+    ZMJ100PRW,
+    ZMJ100PRDH,
+    THC
+};
+
 #endif // COMMON_H

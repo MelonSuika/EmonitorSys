@@ -16,10 +16,14 @@ public:
     explicit SetDeviceTypeForm(QWidget *parent = nullptr);
     ~SetDeviceTypeForm();
 
-    void Create(QList<SerialPortInfo> &pComlist);
+    void Create(QList<SerialPortInfo> *pComlist);
+
+private slots:
+    void on_pushButton_clicked();
 
 private:
     Ui::SetDeviceTypeForm *ui;
+    QList<SerialPortInfo> *m_pComlist;
 };
 
 #endif // SETDEVICETYPEFORM_H

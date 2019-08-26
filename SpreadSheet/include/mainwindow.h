@@ -12,6 +12,7 @@
 #include "serialportinfo.h"
 #include "datasheetform.h"
 #include "chartform.h"
+#include "setdevicetypeform.h"
 
 
 namespace Ui {
@@ -75,7 +76,8 @@ private:
     QPointer<DataSheetForm> m_sheetForm;
     /* 曲线图界面 */
     QPointer<ChartForm> m_chartForm;
-
+    /* 设置界面 */
+    QPointer<SetDeviceTypeForm> m_setForm;
 
     QList<SerialPortInfo> *m_pComlist;
     int m_nComCount;
