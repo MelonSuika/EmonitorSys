@@ -55,7 +55,7 @@ void DashBoardForm::on_pushButton_clicked()
 
 }
 
-void DashBoardForm::rcvRtData(int data)
+void DashBoardForm::rcvRtData(int data, int nDeviceType)
 {
     qDebug()<<"DashBoardForm's rcvRtData = "<<data;
     m_person = data;

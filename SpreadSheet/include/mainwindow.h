@@ -28,7 +28,7 @@ public:
     ~MainWindow();
 
 signals:
-    void sendRtData(int data);
+    void sendRtData(int data, int deviceType);
 
 private slots:
     void errorFunc(QSerialPort::SerialPortError err);

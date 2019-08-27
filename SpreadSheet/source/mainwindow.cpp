@@ -178,12 +178,38 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
     for (int i = 0; i < m_pComlist->size(); i++)
     {       
         QSerialPort *serial = m_pComlist->at(i).m_serial;
+        SerialPortInfo portInfo = m_pComlist->at(i);
         m_pComlist->operator[](i).m_isChkAdrCmd = true;
+
+        if (portInfo.m_nDeviceType == TYPE_NONE)
+        {
+            ui->textEditTest->append(portInfo.m_serial->portName() + "未设置表类型");
+            continue;
+        }
         if (serial->isOpen())
         {
             unsigned short wCrc = 0;
             QByteArray abyd;
-            unsigned char d[8] = TH_CHK_ADDR(0x00, 0x01);
+            unsigned char d[8];
+
+            switch (portInfo.m_nDeviceType)
+            {
+                case THC:
+                {
+                    unsigned char td[8] = TH_CHK_ADDR(0x00, 0x01);
+                    memcpy(d, td, 6);
+                    break;
+                }
+                case HM100PR:
+                {
+                    unsigned char td[8] = HM_CHK_ADDR(0x00, 0x01);
+                    memcpy(d, td, 6);
+                    break;
+                }
+                case TYPE_NONE:
+                    break;
+            }
+
             wCrc = Get_CRC(d, 6);
             d[7] = (wCrc&0xff00)>>8;
             d[6] = (wCrc&0x00ff);
@@ -215,8 +241,18 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
 */
 void analysisTH(QByteArray dataIn, int &tOut, int &hOut)
 {
-    tOut = dataIn[3]*16*16 + dataIn[4];
-    hOut = dataIn[5]*16*16 + dataIn[6];
+    tOut = ((uchar)dataIn[3]*256) + ((uchar)dataIn[4]);
+    hOut = ((uchar)dataIn[5]*256) + ((uchar)dataIn[6]);
+}
+
+/*
+    函数功能:HM100PR解析
+*/
+void analysisHM100PR(QByteArray dataIn, int &tOut, int &pOut, int &cOut)
+{
+    tOut = ((uchar)dataIn[3]*256) + ((uchar)dataIn[4]);
+    pOut = ((uchar)dataIn[5]*256) + (uchar)dataIn[6];
+    cOut = ((uchar)dataIn[7]*256) + (uchar)dataIn[8];
 }
 
 
@@ -230,24 +266,43 @@ void MainWindow::readData()
     for (int i = 0; i < m_pComlist->size(); i++)
     {
 
-        int tOut = -1, hOut = -1;
+        int tOut = -1, hOut = -1, pOut = -1, cOut = -1;
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         SerialPortInfo *serialPortInfo = &m_pComlist->operator[](i);
-        /* 如果是第一次查询地址后的第一次读取，需要判断缓存是否等于7 */
-        if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() != 7)
+
+        if (serialPortInfo->m_nDeviceType == THC)
         {
-            serialPortInfo->m_nWaitSerialCnt++;
-            continue;
+            /* 如果是第一次查询地址后的第一次读取，需要判断缓存是否等于7 */
+            if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() != 7)
+            {
+                serialPortInfo->m_nWaitSerialCnt++;
+                continue;
+            }
+            /* 如果不是查询后的第一次读取，那就是温湿度读取，判断是否大于9 */
+            if (serialPortInfo->m_isChkAdrCmd == false && serial->bytesAvailable() != 9)
+            {
+                serialPortInfo->m_nWaitSerialCnt++;
+                continue;
+            }
         }
-        /* 如果不是查询后的第一次读取，那就是温湿度读取，判断是否大于9 */
-        if (serialPortInfo->m_isChkAdrCmd == false && serial->bytesAvailable() != 9)
+        else if(serialPortInfo->m_nDeviceType == HM100PR)
         {
-            serialPortInfo->m_nWaitSerialCnt++;
-            continue;
+            /* 如果是第一次查询地址后的第一次读取，需要判断缓存是否等于7 */
+            if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() != 7)
+            {
+                serialPortInfo->m_nWaitSerialCnt++;
+                continue;
+            }
+            /* 如果不是查询后的第一次读取，那就是温湿度读取，判断是否大于9 */
+            if (serialPortInfo->m_isChkAdrCmd == false && serial->bytesAvailable() != 11)
+            {
+                serialPortInfo->m_nWaitSerialCnt++;
+                continue;
+            }
+
         }
 
         const QByteArray data = serial->readAll();
-        ui->textEditRcvDisplay->setText(data.toHex());
         if (serialPortInfo->m_isChkAdrCmd == false)
         {
 
@@ -258,7 +313,6 @@ void MainWindow::readData()
                 类中属性----------表中字段
                 对象----------记录
             */
-
             if (serialPortInfo->m_nDeviceType == THC)
             {
                 analysisTH(data, tOut, hOut);
@@ -275,7 +329,17 @@ void MainWindow::readData()
                 }
 
                 /* 温湿度数据插入数据库后，发送信号更新表盘 */
-                emit sendRtData(tOut);
+                emit sendRtData(tOut, serialPortInfo->m_nDeviceType);
+            }
+            else if(serialPortInfo->m_nDeviceType == HM100PR)
+            {
+                analysisHM100PR(data, tOut, pOut, cOut);
+                ui->textEditTest->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+                                          + "压力:" + QString::number(pOut)
+                                          + "密度:" + QString::number(cOut));
+                ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+
+
             }
         }
         /* 读到的是设备地址 */
@@ -283,7 +347,7 @@ void MainWindow::readData()
         {
             serialPortInfo->m_abyAddr[0] = data[3];
             serialPortInfo->m_abyAddr[1] = data[4];
-            ui->textEditTest->append("读取设备地址成功");
+            ui->textEditTest->append("读取设备地址成功" + serialPortInfo->m_abyAddr.toHex());
         }
 
         serialPortInfo->m_nWaitSerialCnt = 0;
@@ -300,10 +364,27 @@ void MainWindow::SendMsgFunc()
     for (int i = 0; i < m_pComlist->size(); i++)
     {
         QSerialPort *serial = m_pComlist->at(i).m_serial;
+        SerialPortInfo portInfo = m_pComlist->at(i);
         unsigned short wCrc = 0;
         QByteArray abyd;
+        uchar d[8];
         abyd.resize(8);
-        uchar d[8] = TH_CHK_DATA((uchar)m_pComlist->at(i).m_abyAddr[1], 2);
+        switch(portInfo.m_nDeviceType)
+        {
+            case THC:
+            {
+                uchar td[8] = TH_CHK_DATA((uchar)portInfo.m_abyAddr[1], 2);
+                memcpy(d, td, 6);
+                break;
+            }
+            case HM100PR:
+            {
+                uchar td[8] = HM_CHK_DATA((uchar)portInfo.m_abyAddr[1], 3);
+                memcpy(d, td, 6);
+                break;
+            }
+
+        }
         wCrc = Get_CRC(d, 6);
         d[7] = (wCrc&0xff00)>>8;
         d[6] = (wCrc&0x00ff);
@@ -379,12 +460,10 @@ void MainWindow::on_pushButton_dashBoard_clicked()
     if (m_dBwdgt == nullptr)
     {
         m_dBwdgt = new DashBoardTabWidget;
-        connect(this, SIGNAL(sendRtData(int)), m_dBwdgt, SLOT(rcvRtData(int)));
+        connect(this, SIGNAL(sendRtData(int, int)), m_dBwdgt, SLOT(rcvRtData(int, int)));
 
     }
     m_dBwdgt->show();
-    /*std::unique_ptr<DashBoardTabWidget> dBwdgt(new DashBoardTabWidget);
-    dBwdgt->show();*/
 
 }
 /*

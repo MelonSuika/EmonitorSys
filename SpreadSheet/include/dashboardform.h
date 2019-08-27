@@ -23,7 +23,7 @@ public:
 private slots:
     void on_pushButton_clicked();
 
-    void rcvRtData(int data);
+    void rcvRtData(int data, int nDeviceType);
 
 private:
     Ui::DashBoardForm *ui;

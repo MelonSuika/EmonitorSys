@@ -16,13 +16,13 @@ public:
     ~DashBoardTabWidget();
 
 signals:
-    void sendRtData(int);
+    void sendRtData(int, int);
 
 private:
     Ui::DashBoardTabWidget *ui;
 
 private slots:
-    void rcvRtData(int n);
+    void rcvRtData(int n, int nDeviceType);
 };
 
 #endif // DASHBOARDTABWIDGET_H

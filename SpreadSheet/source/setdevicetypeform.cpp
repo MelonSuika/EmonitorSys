@@ -7,6 +7,13 @@ SetDeviceTypeForm::SetDeviceTypeForm(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    /* 加载qss改变界面风格 */
+    QFile qssfile(":/qss/widget-blue.qss");
+    qssfile.open(QFile::ReadOnly);
+    QString qss;
+    qss = qssfile.readAll();
+    this->setStyleSheet(qss);
+
 #if 1
     ui->tableWidget->setRowCount(20); //设置行数为20
     ui->tableWidget->setColumnCount(4);
@@ -29,11 +36,11 @@ SetDeviceTypeForm::SetDeviceTypeForm(QWidget *parent) :
     ui->comboBox_deviceType->addItem("ZMJ100P(1)");
     ui->comboBox_deviceType->addItem("ZMJ60XD(2)");
     ui->comboBox_deviceType->addItem("ZMJ100PR(3)");
-    ui->comboBox_deviceType->addItem("HM100PR(4)");
+    ui->comboBox_deviceType->addItem("HM100PR(4)超高压015");
     ui->comboBox_deviceType->addItem("ZMJ100PRO(5)");
     ui->comboBox_deviceType->addItem("ZMJ100PRW(6)");
     ui->comboBox_deviceType->addItem("ZMJ100PRDH(7)");
-    ui->comboBox_deviceType->addItem("THC(8)");
+    ui->comboBox_deviceType->addItem("THC(8)温湿度控制器");
 
     m_pComlist = nullptr;
 

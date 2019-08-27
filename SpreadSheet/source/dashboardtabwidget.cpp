@@ -25,7 +25,7 @@ DashBoardTabWidget::DashBoardTabWidget(QWidget *parent) :
     /* 显示表盘 */
     DashBoardForm *dash = new DashBoardForm;
     ui->verticalLayout->addWidget(dash);
-    connect(this, SIGNAL(sendRtData(int)), dash, SLOT(rcvRtData(int)));
+    connect(this, SIGNAL(sendRtData(int, int)), dash, SLOT(rcvRtData(int, int)));
 
     /* 显示表格 */
     RtDataSheetForm *sheet = new RtDataSheetForm;
@@ -35,7 +35,6 @@ DashBoardTabWidget::DashBoardTabWidget(QWidget *parent) :
     RtChartForm *chart = new RtChartForm;
     ui->gridLayout_chart->addWidget(chart);
 
-
 }
 
 DashBoardTabWidget::~DashBoardTabWidget()
@@ -43,9 +42,9 @@ DashBoardTabWidget::~DashBoardTabWidget()
     delete ui;
 }
 
-void DashBoardTabWidget::rcvRtData(int n)
+void DashBoardTabWidget::rcvRtData(int n, int nDeviceType)
 {
     qDebug()<<"DashBoardTabWidget's rcvRtData = "<<n;
-    emit sendRtData(n);
+    emit sendRtData(n, nDeviceType);
 }
 
