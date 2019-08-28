@@ -21,6 +21,7 @@
 #include <QVector>
 #include <QPointer>
 
+#include <QJsonObject>
 
 #include "dashboardform.h"
 #include "dashboardtabwidget.h"

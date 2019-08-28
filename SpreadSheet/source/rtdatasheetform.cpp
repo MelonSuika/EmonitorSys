@@ -23,3 +23,9 @@ RtDataSheetForm::~RtDataSheetForm()
 {
     delete ui;
 }
+
+void RtDataSheetForm::rcvRtData(QJsonObject *data, int nDeviceType)
+{
+
+
+}

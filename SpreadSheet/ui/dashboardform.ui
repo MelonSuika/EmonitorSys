@@ -49,23 +49,23 @@
           <item>
            <layout class="QGridLayout" name="gridLayout_2">
             <item row="5" column="1">
-             <widget class="QLineEdit" name="lineEdit_5">
+             <widget class="QLineEdit" name="lineEdit_density">
               <property name="text">
-               <string>333</string>
+               <string/>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
              <widget class="QLineEdit" name="lineEdit_2">
               <property name="text">
-               <string>22222</string>
+               <string/>
               </property>
              </widget>
             </item>
             <item row="4" column="1">
-             <widget class="QLineEdit" name="lineEdit_4">
+             <widget class="QLineEdit" name="lineEdit_pressure">
               <property name="text">
-               <string>22</string>
+               <string/>
               </property>
              </widget>
             </item>
@@ -90,14 +90,14 @@
              </spacer>
             </item>
             <item row="4" column="0">
-             <widget class="QLabel" name="label_4">
+             <widget class="QLabel" name="label_pressure">
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;压力:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;压力(MPa):&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
             </item>
             <item row="6" column="0">
-             <widget class="QLabel" name="label_6">
+             <widget class="QLabel" name="label_alert">
               <property name="text">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;警报线:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
@@ -107,21 +107,21 @@
              <widget class="QLineEdit" name="lineEdit"/>
             </item>
             <item row="3" column="0">
-             <widget class="QLabel" name="label_3">
+             <widget class="QLabel" name="label_temperature">
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;温度:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;温度(℃):&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
             </item>
             <item row="6" column="1">
-             <widget class="QLineEdit" name="lineEdit_6">
+             <widget class="QLineEdit" name="lineEdit_alert">
               <property name="text">
-               <string>2222</string>
+               <string/>
               </property>
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QLineEdit" name="lineEdit_3"/>
+             <widget class="QLineEdit" name="lineEdit_temperature"/>
             </item>
             <item row="1" column="0">
              <widget class="QLabel" name="label">
@@ -134,7 +134,7 @@
              </widget>
             </item>
             <item row="5" column="0">
-             <widget class="QLabel" name="label_5">
+             <widget class="QLabel" name="label_density">
               <property name="text">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#ffffff;&quot;&gt;密度:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>

@@ -71,10 +71,6 @@ Rectangle {
     }
     //! [the dial in use]
 
-    function funA(){
-        qDebug()<<person;
-    }
-
     Rectangle {
         id: container
         property int oldWidth: 0
@@ -101,7 +97,6 @@ Rectangle {
             var desiredPercent = /*slider.x*/person * 100 / (oldWidth - 32)
             slider.x = desiredPercent * (width - 32) / 100
             oldWidth = width
-            qDebug()<<"person = "<<person;
         }
 
         Rectangle {

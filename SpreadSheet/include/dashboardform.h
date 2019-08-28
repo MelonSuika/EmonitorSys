@@ -23,7 +23,7 @@ public:
 private slots:
     void on_pushButton_clicked();
 
-    void rcvRtData(int data, int nDeviceType);
+    void rcvRtData(QJsonObject *data, int nDeviceType);
 
 private:
     Ui::DashBoardForm *ui;

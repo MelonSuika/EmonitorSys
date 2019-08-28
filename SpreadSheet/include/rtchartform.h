@@ -20,10 +20,15 @@ public:
 private:
     Ui::RtChartForm *ui;
 
+private slots:
+    void rcvRtData(QJsonObject *, int);
 
+private:
     int m_nMaxSize;
     int m_nMaxX;
     int m_nMaxY;
+
+    int m_nXIndex;
 
     QChart *m_Chart;
     QChartView *m_ChartView;

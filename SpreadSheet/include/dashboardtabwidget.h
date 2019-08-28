@@ -16,13 +16,13 @@ public:
     ~DashBoardTabWidget();
 
 signals:
-    void sendRtData(int, int);
+    void sendRtData(QJsonObject *, int);
 
 private:
     Ui::DashBoardTabWidget *ui;
 
 private slots:
-    void rcvRtData(int n, int nDeviceType);
+    void rcvRtData(QJsonObject *data, int nDeviceType);
 };
 
 #endif // DASHBOARDTABWIDGET_H

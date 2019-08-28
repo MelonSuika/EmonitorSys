@@ -170,7 +170,7 @@
               <item>
                <widget class="QGroupBox" name="groupBox_2">
                 <property name="title">
-                 <string>数据查看</string>
+                 <string>历史数据查询</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_2">
                  <item>
@@ -194,14 +194,14 @@
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_dashBoard">
-                   <property name="text">
-                    <string>实时查看</string>
-                   </property>
-                  </widget>
-                 </item>
                 </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_dashBoard">
+                <property name="text">
+                 <string>实时查看</string>
+                </property>
                </widget>
               </item>
               <item>

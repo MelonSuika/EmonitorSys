@@ -303,6 +303,7 @@ void MainWindow::readData()
         }
 
         const QByteArray data = serial->readAll();
+        QJsonObject *obj = new QJsonObject;
         if (serialPortInfo->m_isChkAdrCmd == false)
         {
 
@@ -328,8 +329,9 @@ void MainWindow::readData()
                     qDebug() << "inserted value 1,25,25!";
                 }
 
-                /* 温湿度数据插入数据库后，发送信号更新表盘 */
-                emit sendRtData(tOut, serialPortInfo->m_nDeviceType);
+
+                obj->insert("温度", tOut);
+                obj->insert("湿度", hOut);
             }
             else if(serialPortInfo->m_nDeviceType == HM100PR)
             {
@@ -338,9 +340,12 @@ void MainWindow::readData()
                                           + "压力:" + QString::number(pOut)
                                           + "密度:" + QString::number(cOut));
                 ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
-
-
+                obj->insert("温度", tOut);
+                obj->insert("压力", pOut);
+                obj->insert("密度", cOut);
             }
+            /* 温湿度数据插入数据库后，发送信号更新表盘 */
+            emit sendRtData(obj, serialPortInfo->m_nDeviceType);
         }
         /* 读到的是设备地址 */
         else
@@ -460,7 +465,7 @@ void MainWindow::on_pushButton_dashBoard_clicked()
     if (m_dBwdgt == nullptr)
     {
         m_dBwdgt = new DashBoardTabWidget;
-        connect(this, SIGNAL(sendRtData(int, int)), m_dBwdgt, SLOT(rcvRtData(int, int)));
+        connect(this, SIGNAL(sendRtData(QJsonObject *, int)), m_dBwdgt, SLOT(rcvRtData(QJsonObject *, int)));
 
     }
     m_dBwdgt->show();

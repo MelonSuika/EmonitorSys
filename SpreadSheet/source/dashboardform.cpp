@@ -4,7 +4,7 @@
 #include <QSerialPortInfo>
 #include <QQmlEngine>
 #include <QQmlContext>
-
+#include <QJsonObject>
 
 DashBoardForm::DashBoardForm(QWidget *parent) :
     QWidget(parent),
@@ -21,7 +21,7 @@ DashBoardForm::DashBoardForm(QWidget *parent) :
 
 
     /* 加载qss改变界面风格 */
-    QFile qssfile(":/qss/widget-dark.qss");
+    QFile qssfile(":/qss/widget-black.qss");
     qssfile.open(QFile::ReadOnly);
     QString qss;
     qss = qssfile.readAll();
@@ -55,10 +55,13 @@ void DashBoardForm::on_pushButton_clicked()
 
 }
 
-void DashBoardForm::rcvRtData(int data, int nDeviceType)
+void DashBoardForm::rcvRtData(QJsonObject *data, int nDeviceType)
 {
-    qDebug()<<"DashBoardForm's rcvRtData = "<<data;
-    m_person = data;
+    m_person = data->value("温度").toInt();
     m_quickWidget->engine()->rootContext()->setContextProperty("person", m_person-2900);
+    ui->lineEdit_temperature->setText(QString::number(data->value("温度").toInt()));
+    ui->lineEdit_pressure->setText(QString::number(data->value("压力").toInt()));
+    ui->lineEdit_density->setText(QString::number(data->value("密度").toInt()));
+
 
 }

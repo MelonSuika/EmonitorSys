@@ -15,6 +15,8 @@ public:
     explicit RtDataSheetForm(QWidget *parent = nullptr);
     ~RtDataSheetForm();
 
+private slots:
+    void rcvRtData(QJsonObject *, int);
 private:
     Ui::RtDataSheetForm *ui;
 };

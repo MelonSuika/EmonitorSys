@@ -50,7 +50,7 @@
   </widget>
   <widget class="QWidget" name="tab_chart">
    <attribute name="title">
-    <string>图变化界面</string>
+    <string>曲线图变化界面</string>
    </attribute>
    <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>

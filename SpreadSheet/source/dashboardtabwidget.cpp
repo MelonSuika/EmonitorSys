@@ -25,15 +25,18 @@ DashBoardTabWidget::DashBoardTabWidget(QWidget *parent) :
     /* 显示表盘 */
     DashBoardForm *dash = new DashBoardForm;
     ui->verticalLayout->addWidget(dash);
-    connect(this, SIGNAL(sendRtData(int, int)), dash, SLOT(rcvRtData(int, int)));
+    connect(this, SIGNAL(sendRtData(QJsonObject *, int)), dash, SLOT(rcvRtData(QJsonObject *, int)));
 
     /* 显示表格 */
     RtDataSheetForm *sheet = new RtDataSheetForm;
     ui->gridLayout_sheet->addWidget(sheet);
+    connect(this, SIGNAL(sendRtData(QJsonObject *, int)), sheet, SLOT(rcvRtData(QJsonObject *, int)));
+
 
     /* 显示图表(曲线图) */
     RtChartForm *chart = new RtChartForm;
     ui->gridLayout_chart->addWidget(chart);
+    connect(this, SIGNAL(sendRtData(QJsonObject *, int)), chart, SLOT(rcvRtData(QJsonObject *, int)));
 
 }
 
@@ -42,9 +45,8 @@ DashBoardTabWidget::~DashBoardTabWidget()
     delete ui;
 }
 
-void DashBoardTabWidget::rcvRtData(int n, int nDeviceType)
+void DashBoardTabWidget::rcvRtData(QJsonObject *data, int nDeviceType)
 {
-    qDebug()<<"DashBoardTabWidget's rcvRtData = "<<n;
-    emit sendRtData(n, nDeviceType);
+    emit sendRtData(data, nDeviceType);
 }
 

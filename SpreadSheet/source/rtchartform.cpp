@@ -38,8 +38,8 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_ChartView->chart()->setAxisX(m_axnisX, m_Series);
 
     m_axnisY = new QValueAxis;
-    m_axnisY->setTitleText("压力");
-    m_axnisY->setRange(0, 10);
+    m_axnisY->setTitleText("压力(MPa)");
+    m_axnisY->setRange(0, 10.00);
     m_axnisY->setLabelFormat("%u");
     m_axnisX->setGridLineVisible(true);
     m_axnisY->setMinorTickCount(1);
@@ -50,9 +50,25 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_ChartView->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     ui->verticalLayout_chart->addWidget(m_ChartView);
 
+
+    m_nXIndex = 0;
+
 }
 
 RtChartForm::~RtChartForm()
 {
     delete ui;
 }
+
+void RtChartForm::rcvRtData(QJsonObject *data, int nDeviceType)
+{
+    qDebug()<<"eee"<<data->value("压力").toInt();
+    m_Series->append(m_nXIndex++, (float)data->value("压力").toInt()/100);
+
+    //m_Series->append(1, data->value("温度").toInt());
+    /*m_chart->axisX()->setMin(m_nEnd-18);
+    m_chart->axisX()->setMax(m_nEnd);*/
+
+}
+
+
