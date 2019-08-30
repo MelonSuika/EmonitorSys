@@ -2,7 +2,8 @@
 
 SerialPortInfo::SerialPortInfo():
     m_serial(new QSerialPort()),
-    m_serialInfo(new QSerialPortInfo())
+    m_serialInfo(new QSerialPortInfo()),
+    m_pDeviceList(new QList<DeviceInfo>())
 {
 
     m_serial = nullptr;
@@ -17,7 +18,6 @@ SerialPortInfo::SerialPortInfo():
 
     m_nDeviceType = TYPE_NONE;
 
-    m_abyAddr.resize(2);
     //connect(m_serial, SIGNAL(QSerialPort::errorOccurred()), this, SLOT(SerialPortInfo::errorFunc()));
     //QObject::connect(m_serial, SIGNAL(QSerialPort::errorOccurred(QSerialPort::SerialPortError)), this, SLOT(SerialPortInfo::errorFunc(QSerialPort::SerialPortError)));
 }

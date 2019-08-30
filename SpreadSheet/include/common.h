@@ -34,7 +34,7 @@
 #define TH_CHK_ADDR(addr, count) {addr, 0x03, 0xff, 0x00, 0x00, count}
 #define TH_CHK_DATA(addr, count) {addr, 0x03, 0x00, 0x00, 0x00, count}
 
-/* HM100PR超高压远传 */
+/* HM100PR超高压远传015 */
 #define HM_CHK_ADDR(addr, count) {0x00, 0x04, 0xff, 0x00, 0x00, count}
 #define HM_CHK_DATA(addr, count) {addr, 0x04, 0x00, 0x00, 0x00, count}
 

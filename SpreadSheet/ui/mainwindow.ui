@@ -146,7 +146,21 @@
                  <item>
                   <widget class="QPushButton" name="pushButtonWriteSerialPort">
                    <property name="text">
-                    <string>串口写数据</string>
+                    <string>查询串口设备地址</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_setDeviceType">
+                   <property name="text">
+                    <string>设置串口设备类型</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton_addChildDevice">
+                   <property name="text">
+                    <string>添加子设备</string>
                    </property>
                   </widget>
                  </item>
@@ -154,13 +168,6 @@
                   <widget class="QPushButton" name="pushButtonReadData">
                    <property name="text">
                     <string>定时读数据</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="pushButton_setDeviceType">
-                   <property name="text">
-                    <string>设置表类型</string>
                    </property>
                   </widget>
                  </item>

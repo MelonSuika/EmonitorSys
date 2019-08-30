@@ -16,11 +16,11 @@ SetDeviceTypeForm::SetDeviceTypeForm(QWidget *parent) :
 
 #if 1
     ui->tableWidget->setRowCount(20); //设置行数为20
-    ui->tableWidget->setColumnCount(4);
+    ui->tableWidget->setColumnCount(5);
 
     /* 设置列名 */
     QStringList headers;
-    headers<< "表号"<<"端口号"<<"表类型"<<"位置";
+    headers<< "表号"<<"端口号"<<"地址"<<"表类型"<<"位置";
     ui->tableWidget->setHorizontalHeaderLabels(headers);
 #endif
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -33,13 +33,13 @@ SetDeviceTypeForm::SetDeviceTypeForm(QWidget *parent) :
 
 
     ui->comboBox_deviceType->addItem(TYPE_NONE + "未设置类型(0)");
-    ui->comboBox_deviceType->addItem("ZMJ100P(1)");
-    ui->comboBox_deviceType->addItem("ZMJ60XD(2)");
-    ui->comboBox_deviceType->addItem("ZMJ100PR(3)");
+    ui->comboBox_deviceType->addItem("ZMJ100P(4)");
+    ui->comboBox_deviceType->addItem("ZMJ60XD(4)");
+    ui->comboBox_deviceType->addItem("ZMJ100PR(4)");
     ui->comboBox_deviceType->addItem("HM100PR(4)超高压015");
-    ui->comboBox_deviceType->addItem("ZMJ100PRO(5)");
-    ui->comboBox_deviceType->addItem("ZMJ100PRW(6)");
-    ui->comboBox_deviceType->addItem("ZMJ100PRDH(7)");
+    ui->comboBox_deviceType->addItem("ZMJ100PRO(4)");
+    ui->comboBox_deviceType->addItem("ZMJ100PRW(4)");
+    ui->comboBox_deviceType->addItem("ZMJ100PRDH(4)");
     ui->comboBox_deviceType->addItem("THC(8)温湿度控制器");
 
     m_pComlist = nullptr;
@@ -54,14 +54,20 @@ SetDeviceTypeForm::~SetDeviceTypeForm()
 
 void SetDeviceTypeForm::Create(QList<SerialPortInfo> *pComlist)
 {
+    int index = 0;
 
     m_pComlist = pComlist;
     for (int i = 0; i < pComlist->size(); i++)
     {
         SerialPortInfo portInfo = pComlist->operator[](i);
-        ui->tableWidget->setItem(i, 0, new QTableWidgetItem(QString::number(i+1)));
-        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(portInfo.m_serial->portName()));
-        ui->tableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(portInfo.m_nDeviceType)));
+        //for (int j = 0; j < portInfo.m_pDeviceList->size(); j++)
+        {
+            ui->tableWidget->setItem(index, 0, new QTableWidgetItem(QString::number(i+1)));
+            ui->tableWidget->setItem(index, 1, new QTableWidgetItem(portInfo.m_serial->portName()));
+            //ui->tableWidget->setItem(index, 2, new QTableWidgetItem(portInfo.m_pDeviceList->operator[](j).m_abyAddr.toInt()));
+            ui->tableWidget->setItem(index, 3, new QTableWidgetItem(QString::number(portInfo.m_nDeviceType)));
+            index++;
+        }
 
     }
 

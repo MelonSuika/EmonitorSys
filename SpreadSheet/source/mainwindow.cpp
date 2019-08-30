@@ -11,6 +11,7 @@
 #include "chartform.h"
 #include "datasheetform.h"
 #include "setdevicetypeform.h"
+#include "addchilddeviceform.h"
 #include <memory>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     isRunFlag           = false;
     m_timer             = new QTimer(this);
+    m_delayTimer        = new QTimer(this);
 
     /* 加载qss改变界面风格 */
     QFile qssfile(":/qss/widget-blue.qss");
@@ -52,11 +54,12 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->comboBoxIsActiveCom->addItem(info.portName());
             //关闭串口等待人为(打开串口按钮)打开
             serialPortInfo.m_serial->close();
-            connect(serialPortInfo.m_serial, &QSerialPort::readyRead, this, &MainWindow::readData);
-            //connect(serialPortInfo.m_serial, SIGNAL(QSerialPort::errorOccurred(QSerialPort::SerialPortError)), this, SLOT(MainWindow::errorFunc(QSerialPort::SerialPortError)));
+            connect(serialPortInfo.m_serial, SIGNAL(readyRead()), this, SLOT(comDelay()));
+
             m_nComCount++;
         }
     }
+    connect(m_delayTimer, SIGNAL(timeout()), this, SLOT(readData()));
 
     /* 初始化指针变量 */
     m_view = nullptr;
@@ -66,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_sheetForm = nullptr;
     m_chartForm = nullptr;
     m_setForm = nullptr;
+    m_nCount = 0;
 }
 
 
@@ -172,6 +176,7 @@ unsigned short Get_CRC(uchar *pBuf, int len)
 
 /*
     函数功能:串口写数据，查询传感器地址
+    note:COM查询地址的时候是广播形式的，所以只需要遍历端口
 */
 void MainWindow::on_pushButtonWriteSerialPort_clicked()
 {
@@ -222,7 +227,7 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
             {
                 serial->write(abyd);
             }
-            ui->textEditTest->append(serial->portName() + ": " + abyd.toHex());
+            ui->textEditTest->append(serial->portName() + " send to lower" + " " + abyd.toHex());
         }
         else
         {
@@ -255,6 +260,15 @@ void analysisHM100PR(QByteArray dataIn, int &tOut, int &pOut, int &cOut)
     cOut = ((uchar)dataIn[7]*256) + (uchar)dataIn[8];
 }
 
+/*
+    函数功能:延时读取
+*/
+void MainWindow::comDelay()
+{
+    qDebug()<<"comDelay";
+    m_delayTimer->start(100);
+
+}
 
 /*
     函数功能:串口读数据
@@ -262,18 +276,17 @@ void analysisHM100PR(QByteArray dataIn, int &tOut, int &pOut, int &cOut)
 void MainWindow::readData()
 {
 
-
+    m_delayTimer->stop();
     for (int i = 0; i < m_pComlist->size(); i++)
     {
-
         int tOut = -1, hOut = -1, pOut = -1, cOut = -1;
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         SerialPortInfo *serialPortInfo = &m_pComlist->operator[](i);
-
+        qDebug()<<"bytes:"<<serial->bytesAvailable();
         if (serialPortInfo->m_nDeviceType == THC)
         {
             /* 如果是第一次查询地址后的第一次读取，需要判断缓存是否等于7 */
-            if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() != 7)
+            if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() < 7)
             {
                 serialPortInfo->m_nWaitSerialCnt++;
                 continue;
@@ -288,21 +301,20 @@ void MainWindow::readData()
         else if(serialPortInfo->m_nDeviceType == HM100PR)
         {
             /* 如果是第一次查询地址后的第一次读取，需要判断缓存是否等于7 */
-            if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() != 7)
+            if (serialPortInfo->m_isChkAdrCmd == true && serial->bytesAvailable() < 7)
             {
                 serialPortInfo->m_nWaitSerialCnt++;
                 continue;
             }
             /* 如果不是查询后的第一次读取，那就是温湿度读取，判断是否大于9 */
-            if (serialPortInfo->m_isChkAdrCmd == false && serial->bytesAvailable() != 11)
+            if (serialPortInfo->m_isChkAdrCmd == false && serial->bytesAvailable() < 11)
             {
                 serialPortInfo->m_nWaitSerialCnt++;
                 continue;
             }
-
         }
 
-        const QByteArray data = serial->readAll();
+
         QJsonObject *obj = new QJsonObject;
         if (serialPortInfo->m_isChkAdrCmd == false)
         {
@@ -314,6 +326,7 @@ void MainWindow::readData()
                 类中属性----------表中字段
                 对象----------记录
             */
+            const QByteArray data = serial->read(11);
             if (serialPortInfo->m_nDeviceType == THC)
             {
                 analysisTH(data, tOut, hOut);
@@ -329,14 +342,13 @@ void MainWindow::readData()
                     qDebug() << "inserted value 1,25,25!";
                 }
 
-
                 obj->insert("温度", tOut);
                 obj->insert("湿度", hOut);
             }
             else if(serialPortInfo->m_nDeviceType == HM100PR)
             {
                 analysisHM100PR(data, tOut, pOut, cOut);
-                ui->textEditTest->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+                ui->textEditTest->setText(serial->portName() + " " + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
                                           + "压力:" + QString::number(pOut)
                                           + "密度:" + QString::number(cOut));
                 ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
@@ -350,9 +362,31 @@ void MainWindow::readData()
         /* 读到的是设备地址 */
         else
         {
-            serialPortInfo->m_abyAddr[0] = data[3];
-            serialPortInfo->m_abyAddr[1] = data[4];
-            ui->textEditTest->append("读取设备地址成功" + serialPortInfo->m_abyAddr.toHex());
+            while(serial->bytesAvailable())
+            {
+                DeviceInfo deviceInfo;
+                bool flag = false;
+                const QByteArray adrData = serial->read(7);
+                for(int i = 0; i < serialPortInfo->m_pDeviceList->size(); i++)
+                {
+                    /* 查找是否已有相同地址的表 */
+                    if (serialPortInfo->m_pDeviceList->operator[](i).m_abyAddr[0] == adrData[3] &&
+                            serialPortInfo->m_pDeviceList->operator[](i).m_abyAddr[1] == adrData[4])
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag == false)
+                {
+                    deviceInfo.m_abyAddr[0] = adrData[3];
+                    deviceInfo.m_abyAddr[1] = adrData[4];
+                    serialPortInfo->m_pDeviceList->append(deviceInfo);
+                    ui->textEditTest->append(serial->portName() + "添加新设备地址成功" + deviceInfo.m_abyAddr.toHex());
+                }
+
+
+            }
         }
 
         serialPortInfo->m_nWaitSerialCnt = 0;
@@ -374,32 +408,37 @@ void MainWindow::SendMsgFunc()
         QByteArray abyd;
         uchar d[8];
         abyd.resize(8);
-        switch(portInfo.m_nDeviceType)
+        for (int j = 0; j < portInfo.m_pDeviceList->size(); j++)
         {
-            case THC:
+            DeviceInfo deviceInfo = portInfo.m_pDeviceList->operator[](j);
+            switch(portInfo.m_nDeviceType)
             {
-                uchar td[8] = TH_CHK_DATA((uchar)portInfo.m_abyAddr[1], 2);
-                memcpy(d, td, 6);
-                break;
-            }
-            case HM100PR:
-            {
-                uchar td[8] = HM_CHK_DATA((uchar)portInfo.m_abyAddr[1], 3);
-                memcpy(d, td, 6);
-                break;
-            }
+                case THC:
+                {
+                    uchar td[8] = TH_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 2);
+                    memcpy(d, td, 6);
+                    break;
+                }
+                case HM100PR:
+                {
+                    uchar td[8] = HM_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 3);
+                    memcpy(d, td, 6);
+                    break;
+                }
 
-        }
-        wCrc = Get_CRC(d, 6);
-        d[7] = (wCrc&0xff00)>>8;
-        d[6] = (wCrc&0x00ff);
-        for (int i = 0; i < 8; i++)
-        {
-            abyd[i] = d[i];
-        }
-        if (serial->isOpen())
-        {
-            serial->write(abyd);
+            }
+            wCrc = Get_CRC(d, 6);
+            d[7] = (wCrc&0xff00)>>8;
+            d[6] = (wCrc&0x00ff);
+            for (int k = 0; k < 8; k++)
+            {
+                abyd[k] = d[k];
+            }
+            if (serial->isOpen())
+            {
+                qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7];
+                serial->write(abyd);
+            }
         }
     }
     return ;
@@ -497,4 +536,19 @@ void MainWindow::on_pushButton_setDeviceType_clicked()
     }
     m_setForm->show();
     m_setForm->Create(m_pComlist);
+}
+
+/*
+    函数功能:添加子设备
+    note:串口连接对象可能是表也可能是集线器，集线器下会再连很多表，所以有时候
+    需要往端口上添加子设备
+*/
+
+void MainWindow::on_pushButton_addChildDevice_clicked()
+{
+    AddChildDeviceForm *addForm = new AddChildDeviceForm();
+
+    addForm->show();
+    addForm->Create(m_pComlist);
+
 }

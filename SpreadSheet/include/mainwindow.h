@@ -55,12 +55,17 @@ private slots:
 
     void on_pushButton_setDeviceType_clicked();
 
+    void comDelay();
+
+    void on_pushButton_addChildDevice_clicked();
+
 private:
     Ui::MainWindow *ui;
     SpreadSheet *m_pSpreadSheet;
     Console *m_console = nullptr;
     /* 串口数组 */
-    QTimer *m_timer;
+    QTimer *m_timer;            /* 定时读取 */
+    QTimer *m_delayTimer;       /* 延时读取timer */
     bool isRunFlag;
     QByteArray m_abyBuffer;     /* 接收数据备份缓存 */
     int m_nWaitSerialCnt;       /* 缓存区数据不够计数 */
@@ -81,6 +86,8 @@ private:
 
     QList<SerialPortInfo> *m_pComlist;
     int m_nComCount;
+    int m_nCount;
+    QByteArray m_adrBuffer;
 
 
 };

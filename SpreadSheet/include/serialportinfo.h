@@ -1,6 +1,7 @@
 #ifndef SERIALPORTINFO_H
 #define SERIALPORTINFO_H
 #include "common.h"
+#include "deviceinfo.h"
 
 class SerialPortInfo
 {
@@ -16,9 +17,7 @@ public:
     int m_nWaitSerialCnt;       /* 缓存区数据不够计数 */
     bool m_isChkAdrCmd;         /* 查询地址命令 */
 
-    QByteArray m_abyAddr;          /* 设备地址 */
-
-
+    QList<DeviceInfo> *m_pDeviceList;
     int m_nDeviceType;
 
 private slots:
