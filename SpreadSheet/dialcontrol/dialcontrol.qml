@@ -79,7 +79,7 @@ Rectangle {
             bottomMargin: 10
         }
         height: 16
-
+        width: 132
         radius: 8
         opacity: 0.7
         antialiasing: true

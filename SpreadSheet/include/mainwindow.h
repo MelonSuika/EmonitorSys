@@ -13,6 +13,7 @@
 #include "datasheetform.h"
 #include "chartform.h"
 #include "setdevicetypeform.h"
+#include "addchilddeviceform.h"
 
 
 namespace Ui {
@@ -83,6 +84,8 @@ private:
     QPointer<ChartForm> m_chartForm;
     /* 设置界面 */
     QPointer<SetDeviceTypeForm> m_setForm;
+    /* 添加子设备界面 */
+    QPointer<AddChildDeviceForm> m_addForm;
 
     QList<SerialPortInfo> *m_pComlist;
     int m_nComCount;

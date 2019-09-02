@@ -69,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_sheetForm = nullptr;
     m_chartForm = nullptr;
     m_setForm = nullptr;
+    m_addForm = nullptr;
     m_nCount = 0;
 }
 
@@ -306,7 +307,7 @@ void MainWindow::readData()
                 serialPortInfo->m_nWaitSerialCnt++;
                 continue;
             }
-            /* 如果不是查询后的第一次读取，那就是温湿度读取，判断是否大于9 */
+            /* 如果不是查询后的第一次读取，那就是温湿度读取，判断是否大于11 */
             if (serialPortInfo->m_isChkAdrCmd == false && serial->bytesAvailable() < 11)
             {
                 serialPortInfo->m_nWaitSerialCnt++;
@@ -327,41 +328,74 @@ void MainWindow::readData()
                 对象----------记录
             */
             const QByteArray data = serial->read(11);
-            if (serialPortInfo->m_nDeviceType == THC)
+            /*for (int k = 0; k <11; k++)
+                qDebug()<<QString::number((uchar)data[k]);*/
+            for (int j = 0; j < serialPortInfo->m_pDeviceList->size(); j++)
             {
-                analysisTH(data, tOut, hOut);
-                ui->textEditTest->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100) + "湿度:" + QString::number(hOut/100) + "." + QString::number(hOut%100));
-                ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
-                /* 插入数据库 */
-                if(!m_sqlQuery.exec("INSERT INTO TH3 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(tOut) + ", " + QString::number(hOut) +  ")"))
+                DeviceInfo info = serialPortInfo->m_pDeviceList->operator[](j);
+                qDebug()<<"addr"<<QString::number((uchar)data[0]);
+                qDebug()<<"info"<<QString::number(info.m_abyAddr[1]);
+                if (info.m_abyAddr[1] == data[0])
                 {
-                    qDebug() << m_sqlQuery.lastError();
-                }
-                else
-                {
-                    qDebug() << "inserted value 1,25,25!";
+                    qDebug()<<"相等"<<data[0];
                 }
 
-                obj->insert("温度", tOut);
-                obj->insert("湿度", hOut);
+                if (serialPortInfo->m_nDeviceType == THC)
+                {
+                    analysisTH(data, tOut, hOut);
+                    ui->textEditTest->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100) + "湿度:" + QString::number(hOut/100) + "." + QString::number(hOut%100));
+                    ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+                    /* 插入数据库 */
+                    if(!m_sqlQuery.exec("INSERT INTO TH3 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(tOut) + ", " + QString::number(hOut) +  ")"))
+                    {
+                        qDebug() << m_sqlQuery.lastError();
+                    }
+                    else
+                    {
+                        qDebug() << "inserted value 1,25,25!";
+                    }
+
+                    obj->insert("温度", tOut);
+                    obj->insert("湿度", hOut);
+                }
+                else if(serialPortInfo->m_nDeviceType == HM100PR)
+                {
+                    analysisHM100PR(data, tOut, pOut, cOut);
+                    if (j < serialPortInfo->m_pDeviceList->size() - 1)
+                    {
+                        ui->textEditTest->append(serial->portName() + "(" + QString::number((uchar)info.m_abyAddr[1]) + ")温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+                                                  + "压力:" + QString::number(pOut)
+                                                  + "密度:" + QString::number(cOut));
+                    }
+                    else
+                    {
+                        ui->textEditTest->setText(serial->portName() + "(" + QString::number((uchar)info.m_abyAddr[1]) + ")温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+                                                  + "压力:" + QString::number(pOut)
+                                                  + "密度:" + QString::number(cOut));
+                    }
+                    ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+                    obj->insert("温度", tOut);
+                    obj->insert("压力", pOut);
+                    obj->insert("密度", cOut);
+
+                    /* 插入数据库 */
+                    if(!m_sqlQuery.exec("INSERT INTO TH015 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(pOut) + ", " + QString::number(cOut) + ", " + QString::number(tOut) +  ")"))
+                    {
+                        qDebug() << m_sqlQuery.lastError();
+                    }
+                    else
+                    {
+                        qDebug() << "inserted value 015,25,25!";
+                    }
+                }
+                /* 温湿度数据插入数据库后，发送信号更新表盘 */
+                emit sendRtData(obj, serialPortInfo->m_nDeviceType);
             }
-            else if(serialPortInfo->m_nDeviceType == HM100PR)
-            {
-                analysisHM100PR(data, tOut, pOut, cOut);
-                ui->textEditTest->setText(serial->portName() + " " + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
-                                          + "压力:" + QString::number(pOut)
-                                          + "密度:" + QString::number(cOut));
-                ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
-                obj->insert("温度", tOut);
-                obj->insert("压力", pOut);
-                obj->insert("密度", cOut);
-            }
-            /* 温湿度数据插入数据库后，发送信号更新表盘 */
-            emit sendRtData(obj, serialPortInfo->m_nDeviceType);
         }
         /* 读到的是设备地址 */
         else
         {
+#if 0
             while(serial->bytesAvailable())
             {
                 DeviceInfo deviceInfo;
@@ -384,9 +418,8 @@ void MainWindow::readData()
                     serialPortInfo->m_pDeviceList->append(deviceInfo);
                     ui->textEditTest->append(serial->portName() + "添加新设备地址成功" + deviceInfo.m_abyAddr.toHex());
                 }
-
-
             }
+#endif
         }
 
         serialPortInfo->m_nWaitSerialCnt = 0;
@@ -436,9 +469,14 @@ void MainWindow::SendMsgFunc()
             }
             if (serial->isOpen())
             {
-                qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7];
+                qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7]<<QTime::currentTime();
                 serial->write(abyd);
             }
+            QTime t;
+            t.start();
+            while(t.elapsed()<100)
+                QCoreApplication::processEvents();
+
         }
     }
     return ;
@@ -546,9 +584,12 @@ void MainWindow::on_pushButton_setDeviceType_clicked()
 
 void MainWindow::on_pushButton_addChildDevice_clicked()
 {
-    AddChildDeviceForm *addForm = new AddChildDeviceForm();
+    if (m_addForm == nullptr)
+    {
+        m_addForm = new AddChildDeviceForm();
+    }
 
-    addForm->show();
-    addForm->Create(m_pComlist);
+    m_addForm->show();
+    m_addForm->Create(m_pComlist);
 
 }

@@ -37,6 +37,14 @@ int main(int argc, char *argv[])
     {
         qDebug() << "Table created!";
     }
+    if (!sqlQuery.exec("create table TH015(time datetime primary key, pressure int, density int, temperature int)"))
+    {
+        qDebug() << "Error: Fail to create table015."<< sqlQuery.lastError();
+    }
+    else
+    {
+        qDebug() << "Table015 created!";
+    }
 
     /* 插入数据 */
     /*QTime::currentTime().toString()*/
