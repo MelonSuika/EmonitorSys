@@ -61,6 +61,11 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     connect(m_delayTimer, SIGNAL(timeout()), this, SLOT(readData()));
 
+
+    /* 定时间隔设置下拉初始化 */
+
+
+
     /* 初始化指针变量 */
     m_view = nullptr;
     m_model = nullptr;
@@ -71,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_setForm = nullptr;
     m_addForm = nullptr;
     m_nCount = 0;
+    m_nReadTimeGap = 5000;
 }
 
 
@@ -189,7 +195,7 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
 
         if (portInfo.m_nDeviceType == TYPE_NONE)
         {
-            ui->textEditTest->append(portInfo.m_serial->portName() + "未设置表类型");
+            ui->textEditTest->append(portInfo.m_serial->portName() + "未设置协议类型");
             continue;
         }
         if (serial->isOpen())
@@ -474,8 +480,10 @@ void MainWindow::SendMsgFunc()
             }
             QTime t;
             t.start();
-            while(t.elapsed()<100)
+            while(t.elapsed() < POLL_GAP)
+            {
                 QCoreApplication::processEvents();
+            }
 
         }
     }
@@ -493,12 +501,15 @@ void MainWindow::on_pushButtonReadData_clicked()
         disconnect(m_timer, SIGNAL(timeout()), this, SLOT(SendMsgFunc()));
         m_timer->stop();
         ui->textEditTest->append("定时读取关闭");
+        ui->pushButtonReadData->setText("定时读取开启");
+
     }
     else
     {
         connect(m_timer, SIGNAL(timeout()), this, SLOT(SendMsgFunc()));
-        m_timer->start(5*1000);
+        m_timer->start(m_nReadTimeGap);
         ui->textEditTest->append("定时读取开启");
+        ui->pushButtonReadData->setText("定时读取关闭");
     }
 
 }
@@ -591,5 +602,28 @@ void MainWindow::on_pushButton_addChildDevice_clicked()
 
     m_addForm->show();
     m_addForm->Create(m_pComlist);
+
+}
+
+/*
+    函数功能:设置读取间隔时间
+*/
+void MainWindow::on_pushButton_readSet_clicked()
+{
+    int nRet = 0;
+    nRet = ui->lineEdit_readSet->text().toInt();
+    if (nRet == 0)
+    {
+        ui->textEditTest->append("设置时间格式错误");
+    }
+    else if(3>nRet || nRet>3600){
+        ui->textEditTest->append("设置时间范围出错(实际表数*2~3600)");
+    }
+    else {
+        m_nReadTimeGap = nRet*1000;
+        ui->textEditTest->append("重设间隔为:" + QString::number(nRet) + "秒");
+        on_pushButtonReadData_clicked();
+        on_pushButtonReadData_clicked();
+    }
 
 }

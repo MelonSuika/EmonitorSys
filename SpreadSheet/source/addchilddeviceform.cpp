@@ -104,7 +104,7 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
                 {
                     ui->tableWidget->setItem(k, 0, new QTableWidgetItem(QString::number(k+1)));
                     ui->tableWidget->setItem(k, 1, new QTableWidgetItem(portInfo.m_serial->portName()));
-                    ui->tableWidget->setItem(k, 2, new QTableWidgetItem(QString::number(info.m_abyAddr[1])));
+                    ui->tableWidget->setItem(k, 2, new QTableWidgetItem(QString::number((uchar)info.m_abyAddr[1])));
                     ui->tableWidget->setItem(k, 3, new QTableWidgetItem(QString::number(portInfo.m_nDeviceType)));
                     break;
                 }

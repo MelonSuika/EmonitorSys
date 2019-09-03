@@ -52,4 +52,7 @@ enum DeviceType{
     THC
 };
 
+/* 轮询间隔 */
+#define POLL_GAP 500
+
 #endif // COMMON_H

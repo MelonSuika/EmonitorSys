@@ -18,7 +18,7 @@ public:
     ~DashBoardForm();
 
     void funD(){qDebug()<<"aaa";}
-    int m_person;
+    int m_nPressure;
 
 private slots:
     void on_pushButton_clicked();

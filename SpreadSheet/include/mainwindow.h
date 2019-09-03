@@ -60,6 +60,8 @@ private slots:
 
     void on_pushButton_addChildDevice_clicked();
 
+    void on_pushButton_readSet_clicked();
+
 private:
     Ui::MainWindow *ui;
     SpreadSheet *m_pSpreadSheet;
@@ -91,6 +93,8 @@ private:
     int m_nComCount;
     int m_nCount;
     QByteArray m_adrBuffer;
+
+    int m_nReadTimeGap;
 
 
 };

@@ -121,14 +121,14 @@ QStatusBar::item {
 
 /**********分组框**********/
 QGroupBox {
-                font-size: 15px;
+                font-size: 13px;
                 border: 1px solid rgb(111, 156, 207);
                 border-radius: 4px;
-                margin-top: 10px;
+                margin-top: 8px;
 }
 QGroupBox::title {
                 color: rgb(56, 99, 154);
-                top: -12px;
+                top: -6px;
                 left: 10px;
 }
 
@@ -363,6 +363,7 @@ QComboBox {
         border-radius: 4px;
         border: 1px solid rgb(111, 156, 207);
         background: white;
+
 }
 QComboBox:enabled {
         color: rgb(84, 84, 84);

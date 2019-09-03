@@ -67,7 +67,7 @@ Rectangle {
     Dial {
         id: dial
         anchors.centerIn: parent
-        value: /*slider.x*/person * 100 / (container.width - 32)
+        value: /*slider.x*/pressure * 100 / (container.width - 32)
     }
     //! [the dial in use]
 
@@ -94,7 +94,7 @@ Rectangle {
                 return
             }
 
-            var desiredPercent = /*slider.x*/person * 100 / (oldWidth - 32)
+            var desiredPercent = /*slider.x*/pressure * 100 / (oldWidth - 32)
             slider.x = desiredPercent * (width - 32) / 100
             oldWidth = width
         }
