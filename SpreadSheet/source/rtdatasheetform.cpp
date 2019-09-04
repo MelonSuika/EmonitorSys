@@ -9,7 +9,7 @@ RtDataSheetForm::RtDataSheetForm(QWidget *parent) :
 
     //ui->tableWidget;
 
-    ui->tableWidget->setRowCount(20); //设置行数为10
+    ui->tableWidget->setRowCount(65); //设置行数为10
     ui->tableWidget->setColumnCount(5);
 
     /* 设置列名 */

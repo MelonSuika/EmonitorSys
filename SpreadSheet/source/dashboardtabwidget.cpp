@@ -12,7 +12,7 @@ DashBoardTabWidget::DashBoardTabWidget(QWidget *parent) :
     ui->setupUi(this);
 
     /* 固定大小 */
-    this->setFixedSize(900, 650);
+    //this->setFixedSize(900, 650);
 
     /* 加载qss改变界面风格 */
     QFile qssfile(":/qss/widget-black.qss");

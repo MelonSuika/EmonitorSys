@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QDebug>
 #include <QQuickWidget>
+#include "rtchartform.h"
 
 namespace Ui {
 class DashBoardForm;
@@ -20,14 +21,17 @@ public:
     void funD(){qDebug()<<"aaa";}
     int m_nPressure;
 
+signals:
+    void sendToMChart(QJsonObject *, int);
+
 private slots:
-    void on_pushButton_clicked();
 
     void rcvRtData(QJsonObject *data, int nDeviceType);
 
 private:
     Ui::DashBoardForm *ui;
     QQuickWidget *m_quickWidget;
+    RtChartForm *m_chartForm;
 };
 
 #endif // DASHBOARDFORM_H

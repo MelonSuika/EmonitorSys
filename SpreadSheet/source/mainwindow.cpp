@@ -64,6 +64,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     /* 定时间隔设置下拉初始化 */
 
+    /* 查询地址隐去 */
+    ui->pushButtonWriteSerialPort->hide();
 
 
     /* 初始化指针变量 */
@@ -383,6 +385,7 @@ void MainWindow::readData()
                     obj->insert("温度", tOut);
                     obj->insert("压力", pOut);
                     obj->insert("密度", cOut);
+                    obj->insert("地址", (uchar)info.m_abyAddr[1]);
 
                     /* 插入数据库 */
                     if(!m_sqlQuery.exec("INSERT INTO TH015 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(pOut) + ", " + QString::number(cOut) + ", " + QString::number(tOut) +  ")"))
@@ -475,7 +478,7 @@ void MainWindow::SendMsgFunc()
             }
             if (serial->isOpen())
             {
-                qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7]<<QTime::currentTime();
+                qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7]<<QTime::currentTime()<<QString::number((uchar)deviceInfo.m_abyAddr[1]);
                 serial->write(abyd);
             }
             QTime t;
@@ -616,7 +619,7 @@ void MainWindow::on_pushButton_readSet_clicked()
     {
         ui->textEditTest->append("设置时间格式错误");
     }
-    else if(3>nRet || nRet>3600){
+    else if(2>nRet || nRet>3600){
         ui->textEditTest->append("设置时间范围出错(实际表数*2~3600)");
     }
     else {

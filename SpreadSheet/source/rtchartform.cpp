@@ -2,6 +2,7 @@
 #include "ui_rtchartform.h"
 #include <QSerialPortInfo>
 #include <QSerialPort>
+#include <QDateTimeAxis>
 
 RtChartForm::RtChartForm(QWidget *parent) :
     QWidget(parent),
@@ -23,9 +24,14 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_Chart->addSeries(m_Series);
     //m_Chart->legend()->hide();
     m_Chart->setTitle("曲线图");
-    m_Chart->createDefaultAxes();
+    //m_Chart->createDefaultAxes();
+
+    /* expanding */
+    m_Chart->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+
 
     m_ChartView = new QChartView(m_Chart);
+#if 0
     m_axnisX = new QValueAxis;
     m_axnisX->setTitleText("时间");
     m_axnisX->setRange(0, 24);
@@ -33,16 +39,28 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_axnisX->setLabelFormat("%u");
     m_axnisX->setGridLineVisible(true);
     m_axnisX->setMinorTickCount(1);
+#else
+    m_dateTimeAxisX = new QDateTimeAxis();
+    m_dateTimeAxisX->setTitleText("时间");
+    m_dateTimeAxisX->setRange(QDateTime::currentDateTime(), QDateTime::currentDateTime().addSecs(60));
 
+    m_dateTimeAxisX->setFormat("H:mm:ss");
+    m_dateTimeAxisX->setLabelsAngle(60);
+    m_dateTimeAxisX->setTickCount(15);
+#endif
 
-    m_ChartView->chart()->setAxisX(m_axnisX, m_Series);
+    m_ChartView->chart()->addAxis(m_dateTimeAxisX, Qt::AlignBottom);
+    m_Series->attachAxis(m_dateTimeAxisX);
 
+    m_ChartView->chart()->legend()->hide();
+    m_ChartView->chart()->setTheme(QtCharts::QChart::ChartThemeDark);
+
+    /* Y轴设置 */
     m_axnisY = new QValueAxis;
     m_axnisY->setTitleText("压力(MPa)");
-    m_axnisY->setRange(0, 10.00);
-    m_axnisY->setLabelFormat("%u");
-    m_axnisX->setGridLineVisible(true);
-    m_axnisY->setMinorTickCount(1);
+    m_axnisY->setRange(-0.100, 0.900);
+    m_axnisY->setLabelFormat("%.2f");
+    m_axnisY->setMinorTickCount(0.01);
     m_ChartView->chart()->setAxisY(m_axnisY, m_Series);
 
     m_ChartView->setRenderHint(QPainter::Antialiasing);
@@ -62,12 +80,21 @@ RtChartForm::~RtChartForm()
 
 void RtChartForm::rcvRtData(QJsonObject *data, int nDeviceType)
 {
-    qDebug()<<"eee"<<data->value("压力").toInt();
-    m_Series->append(m_nXIndex++, (float)data->value("压力").toInt()/100);
+    //qDebug()<<"eee"<<data->value("压力").toInt();
+    int p = data->value("压力").toInt();
+    int t = data->value("温度").toInt();
+    int c = data->value("密度").toInt();
 
-    //m_Series->append(1, data->value("温度").toInt());
-    /*m_chart->axisX()->setMin(m_nEnd-18);
-    m_chart->axisX()->setMax(m_nEnd);*/
+    qint64 x = QDateTime::currentMSecsSinceEpoch();
+    /* 当前时间大于最大x坐标，当前时间设为x最大坐标 */
+    if (x > m_dateTimeAxisX->max().toMSecsSinceEpoch())
+    {
+        //qDebug()<<"tttt"<<QDateTime::fromMSecsSinceEpoch(x - m_dateTimeAxisX->max().toMSecsSinceEpoch() + m_dateTimeAxisX->min().toMSecsSinceEpoch());
+        m_dateTimeAxisX->setMin(QDateTime::fromMSecsSinceEpoch(x - m_dateTimeAxisX->max().toMSecsSinceEpoch() + m_dateTimeAxisX->min().toMSecsSinceEpoch()));
+        m_dateTimeAxisX->setMax(QDateTime::currentDateTime());
+
+    }
+    m_Series->append(x, (float)p/10000);
 
 }
 

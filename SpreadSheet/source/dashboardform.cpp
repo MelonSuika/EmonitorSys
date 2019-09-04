@@ -5,6 +5,8 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QJsonObject>
+#include "rtchartform.h"
+
 
 DashBoardForm::DashBoardForm(QWidget *parent) :
     QWidget(parent),
@@ -28,10 +30,21 @@ DashBoardForm::DashBoardForm(QWidget *parent) :
     this->setStyleSheet(qss);
 
 
+    /* 加载表盘 */
     m_quickWidget = new QQuickWidget;
     m_quickWidget->setSource(QUrl("qrc:/dialcontrol.qml"));
     ui->verticalLayout_dashBoard->addWidget(m_quickWidget);
+    /* 固定大小 */
+    //this->setFixedSize(900, 650);
+    m_quickWidget->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+    m_quickWidget->setFixedSize(625, 600);
 
+    /* chart */
+    m_chartForm = new RtChartForm;
+    ui->gridLayout_chart->addWidget(m_chartForm);
+    connect(this, SIGNAL(sendToMChart(QJsonObject *, int)), m_chartForm, SLOT(rcvRtData(QJsonObject *, int)));
+
+    ui->pushButton_rtDisplay->hide();
 
     /* 数据交互  */
     m_nPressure = 0;
@@ -47,26 +60,26 @@ DashBoardForm::~DashBoardForm()
     delete ui;
 }
 
-void DashBoardForm::on_pushButton_clicked()
-{
-    //m_person = rand()%200;
-    //m_quickWidget->engine()->rootContext()->setContextProperty("person", m_person);
-    //qDebug()<<"person = "<<m_person;
-
-}
 
 void DashBoardForm::rcvRtData(QJsonObject *data, int nDeviceType)
 {
+    QString str = ui->lineEdit_address->text();
+    if (str == "" || str == QString::number(data->value("地址").toInt()))
+    {
 
-    int t = data->value("温度").toInt();
-    int p = data->value("压力").toInt();
-    int c = data->value("密度").toInt();
-    m_nPressure = p;
+        emit sendToMChart(data, nDeviceType);
+        int t = data->value("温度").toInt();
+        int p = data->value("压力").toInt();
+        int c = data->value("密度").toInt();
+        m_nPressure = p;
 
-    m_quickWidget->engine()->rootContext()->setContextProperty("pressure", (float)(m_nPressure+320)/12);
-    ui->lineEdit_temperature->setText(QString::number((float)t/100));
-    ui->lineEdit_pressure->setText(QString::number((float)p/10000));
-    ui->lineEdit_density->setText(QString::number((float)c/10000));
+        m_quickWidget->engine()->rootContext()->setContextProperty("pressure", (float)(m_nPressure+320)/12);
+
+        ui->lineEdit_address->setText(QString::number(data->value("地址").toInt()));
+        ui->lineEdit_temperature->setText(QString::number((float)t/100));
+        ui->lineEdit_pressure->setText(QString::number((float)p/10000));
+        ui->lineEdit_density->setText(QString::number((float)c/10000));
+    }
 
 
 }

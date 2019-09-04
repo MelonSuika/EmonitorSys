@@ -35,6 +35,7 @@ private:
     QLineSeries *m_Series;
     QValueAxis *m_axnisX;
     QValueAxis *m_axnisY;
+    QDateTimeAxis *m_dateTimeAxisX;
 
 
 };

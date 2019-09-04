@@ -56,10 +56,12 @@ import "content"
 
 //! [0]
 Rectangle {
-    color: "#545454"
+    //color: "#545454"
+    color: "#222222"
     //width: 600; height: 600
-    width: 625; height: 610
-    x:-10; y:-20
+    width: 645; height: 620
+    //width: 2000; height: 2000
+    x:-10; y:-10
     scale:1.0
 
     //! [the dial in use]
