@@ -21,6 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);    
 
+    /* 隐去部分控件 */
+    ui->pushButton_setDeviceType->hide();
+
     isRunFlag           = false;
     m_timer             = new QTimer(this);
     m_delayTimer        = new QTimer(this);
@@ -336,8 +339,6 @@ void MainWindow::readData()
                 对象----------记录
             */
             const QByteArray data = serial->read(11);
-            /*for (int k = 0; k <11; k++)
-                qDebug()<<QString::number((uchar)data[k]);*/
             for (int j = 0; j < serialPortInfo->m_pDeviceList->size(); j++)
             {
                 DeviceInfo info = serialPortInfo->m_pDeviceList->operator[](j);

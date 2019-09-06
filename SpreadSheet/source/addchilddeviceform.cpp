@@ -62,7 +62,7 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
         {
             ui->tableWidget->setItem(index, 0, new QTableWidgetItem(QString::number(i+1)));
             ui->tableWidget->setItem(index, 1, new QTableWidgetItem(portInfo.m_serial->portName()));
-            ui->tableWidget->setItem(index, 2, new QTableWidgetItem(QString::number(portInfo.m_pDeviceList->operator[](j).m_abyAddr[1])));
+            ui->tableWidget->setItem(index, 2, new QTableWidgetItem(QString::number((uchar)portInfo.m_pDeviceList->operator[](j).m_abyAddr[1])));
             ui->tableWidget->setItem(index, 3, new QTableWidgetItem(QString::number(portInfo.m_nDeviceType)));
             index++;
         }
@@ -70,18 +70,20 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
     }
 }
 
+
 void AddChildDeviceForm::on_pushButton_ok_clicked()
 {
     for (int i = 0; i < m_pComlist->size(); i++)
     {
-        SerialPortInfo portInfo = m_pComlist->operator[](i);
+        SerialPortInfo *portInfo = &m_pComlist->operator[](i);
         bool flag = false;
         QString str = ui->lineEdit_addr->text();
-        if (ui->comboBox_com->currentText() == portInfo.m_serial->portName())
+        int nDType = comtextToType(ui->comboBox_type->currentText());
+        if (ui->comboBox_com->currentText() == portInfo->m_serial->portName())
         {
-            for (int j = 0; j < portInfo.m_pDeviceList->size(); j++)
+            for (int j = 0; j < portInfo->m_pDeviceList->size(); j++)
             {
-                DeviceInfo info = portInfo.m_pDeviceList->operator[](j);
+                DeviceInfo info = portInfo->m_pDeviceList->operator[](j);
                 if (QString::number(info.m_abyAddr[1]).toInt() == str.toInt())
                 {
                     flag = true;
@@ -91,6 +93,8 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
         }
         if (flag == false)
         {
+            portInfo->m_nDeviceType = nDType;
+
             DeviceInfo info;
             int n = str.toInt();
             info.m_abyAddr[0] = 0;
@@ -103,12 +107,29 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
                 if(ui->tableWidget->item(k, 0) == nullptr)
                 {
                     ui->tableWidget->setItem(k, 0, new QTableWidgetItem(QString::number(k+1)));
-                    ui->tableWidget->setItem(k, 1, new QTableWidgetItem(portInfo.m_serial->portName()));
+                    ui->tableWidget->setItem(k, 1, new QTableWidgetItem(portInfo->m_serial->portName()));
                     ui->tableWidget->setItem(k, 2, new QTableWidgetItem(QString::number((uchar)info.m_abyAddr[1])));
-                    ui->tableWidget->setItem(k, 3, new QTableWidgetItem(QString::number(portInfo.m_nDeviceType)));
+                    ui->tableWidget->setItem(k, 3, new QTableWidgetItem(QString::number(nDType)));
                     break;
                 }
             }
+        }
+        else
+        {
+            if (portInfo->m_nDeviceType != nDType)
+            {
+                /* 协议类型 */
+                portInfo->m_nDeviceType = nDType;
+                for (int k = 0; ; k++)
+                {
+                    if(ui->tableWidget->item(k, 0) == nullptr)
+                    {
+                        break;
+                    }
+                    ui->tableWidget->setItem(k, 3, new QTableWidgetItem(QString::number(portInfo->m_nDeviceType)));
+                }
+            }
+
         }
 
     }

@@ -32,6 +32,34 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButton_allDisplay">
+         <property name="text">
+          <string>全显</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_density">
+         <property name="text">
+          <string>密度</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_pressure">
+         <property name="text">
+          <string>压力</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_temperature">
+         <property name="text">
+          <string>温度</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
           <string/>

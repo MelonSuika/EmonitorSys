@@ -73,12 +73,13 @@ void DashBoardForm::rcvRtData(QJsonObject *data, int nDeviceType)
         int c = data->value("密度").toInt();
         m_nPressure = p;
 
-        m_quickWidget->engine()->rootContext()->setContextProperty("pressure", (float)(m_nPressure+320)/12);
+        /* 结合图片尺寸计算转动角度,1=2.7° */
+        m_quickWidget->engine()->rootContext()->setContextProperty("pressure", (float)(m_nPressure+1000)*2.8/100);
 
         ui->lineEdit_address->setText(QString::number(data->value("地址").toInt()));
         ui->lineEdit_temperature->setText(QString::number((float)t/100));
-        ui->lineEdit_pressure->setText(QString::number((float)p/10000));
-        ui->lineEdit_density->setText(QString::number((float)c/10000));
+        ui->lineEdit_pressure->setText(QString::number((float)p/10000 - 0.1));
+        ui->lineEdit_density->setText(QString::number((float)c/10000 - 0.1));
     }
 
 

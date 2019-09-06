@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SpreadSheet
+TARGET = SF6Esys
 TEMPLATE = app
 
 # The following define makes your compiler emit warnings if you use
@@ -43,6 +43,7 @@ SOURCES += \
     ./source/setdevicetypeform.cpp \
     ./source/deviceinfo.cpp \
     ./source/addchilddeviceform.cpp \
+    ./source/callout.cpp \
         spreadsheet/source/printview.cpp \
         spreadsheet/source/spreadsheet.cpp \
         spreadsheet/source/spreadsheetdelegate.cpp \
@@ -63,6 +64,7 @@ HEADERS += \
     ./include/setdevicetypeform.h \
     ./include/deviceinfo.h \
     ./include/addchilddeviceform.h \
+    ./include/callout.h \
         spreadsheet/include/printview.h \
         spreadsheet/include/spreadsheet.h \
         spreadsheet/include/spreadsheetdelegate.h \
@@ -92,6 +94,7 @@ QT += quick
 #图表
 QT += charts
 QT += quickwidgets
+QT += widgets
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

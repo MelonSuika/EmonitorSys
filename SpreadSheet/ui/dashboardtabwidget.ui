@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>展台控制台</string>
+   <string>实时界面</string>
   </property>
   <property name="currentIndex">
    <number>0</number>

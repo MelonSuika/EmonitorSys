@@ -73,38 +73,31 @@ void SetDeviceTypeForm::Create(QList<SerialPortInfo> *pComlist)
 
 }
 
-int comtextToType(QString str)
-{
-    QString num = "";
-    bool flag = false;
-    for (int i = 0; i < str.size(); i++)
-    {
-        if (str[i] == ")")
-        {
-            break;
-        }
-        if (flag)
-        {
-            num += str[i];
-        }
-        if (str[i] == "(")
-        {
-            flag = true;
-        }
 
-    }
-    return num.toInt();
-
-}
 void SetDeviceTypeForm::on_pushButton_clicked()
 {
     for (int i = 0; i < m_pComlist->size(); i++)
     {
         SerialPortInfo *portInfo = &m_pComlist->operator[](i);
-        if (portInfo->m_serial->portName() == ui->comboBox_com->currentText())
+        QString strCom = ui->comboBox_com->currentText();
+        if (portInfo->m_serial->portName() == strCom)
         {
             portInfo->m_nDeviceType = comtextToType(ui->comboBox_deviceType->currentText());
             qDebug()<<portInfo->m_nDeviceType;
+            for (int j = 0; ; j++)
+            {
+                if (ui->tableWidget->item(j, 1) == nullptr)
+                {
+                    break;
+                }
+                if (strCom == ui->tableWidget->item(j, 1)->text())
+                {
+                    ui->tableWidget->item(j, 3);
+                    ui->tableWidget->setItem(j, 3, new QTableWidgetItem(QString::number(portInfo->m_nDeviceType)));
+                    break;
+                }
+
+            }
             break;
         }
     }

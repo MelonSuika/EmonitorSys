@@ -55,4 +55,6 @@ enum DeviceType{
 /* 轮询间隔 */
 #define POLL_GAP 500
 
+int comtextToType(QString str);
+
 #endif // COMMON_H
