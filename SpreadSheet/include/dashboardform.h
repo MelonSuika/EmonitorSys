@@ -20,6 +20,7 @@ public:
 
     void funD(){qDebug()<<"aaa";}
     int m_nPressure;
+    int m_nDensity;
 
 signals:
     void sendToMChart(QJsonObject *, int);

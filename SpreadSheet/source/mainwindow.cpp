@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+ #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "QLayout"
 #include "spreadsheet.h"
@@ -12,7 +12,13 @@
 #include "datasheetform.h"
 #include "setdevicetypeform.h"
 #include "addchilddeviceform.h"
+#include "gasrelaymonitorform.h"
 #include <memory>
+#include <QQmlEngine>
+#include <QQmlContext>
+#include <QEvent>
+#include <QResizeEvent>
+#include "myqquickwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -27,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     isRunFlag           = false;
     m_timer             = new QTimer(this);
     m_delayTimer        = new QTimer(this);
+    //m_delayReadTimer    = new QTimer(this);
+    //m_gasTimer          = new QTimer(this);
 
     /* 加载qss改变界面风格 */
     QFile qssfile(":/qss/widget-blue.qss");
@@ -34,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QString qss;
     qss = qssfile.readAll();
     this->setStyleSheet(qss);
+
 
     /* textEditDebug防止信息太多崩溃 */
     ui->textEditDebug->document()->setMaximumBlockCount(100);
@@ -57,12 +66,12 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->comboBoxIsActiveCom->addItem(info.portName());
             //关闭串口等待人为(打开串口按钮)打开
             serialPortInfo.m_serial->close();
-            connect(serialPortInfo.m_serial, SIGNAL(readyRead()), this, SLOT(comDelay()));
+            //connect(serialPortInfo.m_serial, SIGNAL(readyRead()), this, SLOT(comDelay()));
 
             m_nComCount++;
         }
     }
-    connect(m_delayTimer, SIGNAL(timeout()), this, SLOT(readData()));
+    //connect(m_delayTimer, SIGNAL(timeout()), this, SLOT(readData()));
 
 
     /* 定时间隔设置下拉初始化 */
@@ -80,8 +89,12 @@ MainWindow::MainWindow(QWidget *parent) :
     m_chartForm = nullptr;
     m_setForm = nullptr;
     m_addForm = nullptr;
+    m_gasQuickForm = nullptr;
     m_nCount = 0;
     m_nReadTimeGap = 5000;
+
+
+    m_test = 0;
 }
 
 
@@ -289,6 +302,8 @@ void MainWindow::readData()
 {
 
     m_delayTimer->stop();
+    m_isReadSuccess = false;
+
     for (int i = 0; i < m_pComlist->size(); i++)
     {
         int tOut = -1, hOut = -1, pOut = -1, cOut = -1;
@@ -437,24 +452,159 @@ void MainWindow::readData()
     }
 }
 
+void readData2(QSerialPort *serial)
+{
+    int size = 0;
+    //while(size < 11)
+    {
+
+        const QByteArray data = serial->read(25);
+        size += data.size();
+
+    }
+    qDebug()<<"outSize:"<<size;
+
+
+}
+
+/*
+    函数功能: 读取指定设备数据
+    实际上对于上位机，只有com口之分，指定的nIndex只是
+    每个com口中连接添加的设备
+*/
+void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
+{
+
+    int tOut = -1, hOut = -1, pOut = -1, cOut = -1;
+    QSerialPort *serial = m_pComlist->at(deviceSbInfo.nComIndex).m_serial;
+    SerialPortInfo *serialPortInfo = &m_pComlist->operator[](deviceSbInfo.nComIndex);
+    DeviceInfo *pCurInfo = &serialPortInfo->m_pDeviceList->operator[](deviceSbInfo.nDeviceIndex);
+
+    const QByteArray data = serial->readAll();
+
+    if (data.size() == 0)
+    {
+        /* 读不到数据3次，继续下个设备 */
+        if (pCurInfo->m_nReadErrorCount < 3)
+        {
+            pCurInfo->m_nReadErrorCount++;
+            QTimer::singleShot(500, this, [=](){readDeviceData(deviceSbInfo);});
+            ui->textEditTest->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")读取异常");
+        }
+        else
+        {
+            QTimer::singleShot(0, this, [=](){SendMsgFunc(deviceSbInfo.nDeviceIndex+1);});
+            pCurInfo->m_nReadErrorCount = 0;
+        }
+        return;
+    }
+
+
+    analysisHM100PR(data, tOut, pOut, cOut);
+
+    ui->textEditTest->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+                              + "压力:" + QString::number(pOut)
+                              + "密度:" + QString::number(cOut));
+
+
+    ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+    QJsonObject obj;
+    obj.insert("温度", tOut);
+    obj.insert("压力", pOut);
+    obj.insert("密度", cOut);
+    obj.insert("地址", (uchar)pCurInfo->m_abyAddr[1]);
+
+    /* 插入数据库 */
+    if(!m_sqlQuery.exec("INSERT INTO TH015 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(pOut) + ", " + QString::number(cOut) + ", " + QString::number(tOut) +  ")"))
+    {
+        qDebug() << m_sqlQuery.lastError();
+    }
+    else
+    {
+        qDebug() << "inserted value 015,25,25!";
+    }
+    /* 温湿度数据插入数据库后，发送信号更新表盘 */
+    if (deviceSbInfo.nDeviceIndex == 0)
+    {
+        emit sendRtData(&obj, serialPortInfo->m_nDeviceType);
+    }
+
+    QTimer::singleShot(0, this, [=](){SendMsgFunc(deviceSbInfo.nDeviceIndex+1);});
+
+}
+
+
 /*
     函数功能:定时给串口发送读数据消息
 */
 
-void MainWindow::SendMsgFunc()
+void MainWindow::SendMsgFunc(int nIndex)
 {
+
     for (int i = 0; i < m_pComlist->size(); i++)
     {
+        DeviceSymbolInfo deviceSbInfo;
+        deviceSbInfo.nComIndex = i;
+        deviceSbInfo.nDeviceIndex = nIndex;
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         SerialPortInfo portInfo = m_pComlist->at(i);
         unsigned short wCrc = 0;
         QByteArray abyd;
         uchar d[8];
         abyd.resize(8);
+        if (!serial->isOpen())
+        {
+            continue;
+        }
+
+        /* If the nIndex exceeds max size, send from 0 */
+        if (nIndex >= portInfo.m_pDeviceList->size())
+        {
+            QTimer::singleShot(0, this, [=](){SendMsgFunc(0);});
+            return;
+
+        }
+        else
+        {
+            DeviceInfo deviceInfo = portInfo.m_pDeviceList->operator[](nIndex);
+            switch(deviceInfo.m_nDeviceType)
+            {
+                case THC:
+                {
+                    uchar td[8] = TH_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 2);
+                    memcpy(d, td, 6);
+                    break;
+                }
+                case HM100PR:
+                {
+                    uchar td[8] = HM_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 3);
+                    memcpy(d, td, 6);
+                    break;
+                }
+
+            }
+            wCrc = Get_CRC(d, 6);
+            d[7] = (wCrc&0xff00)>>8;
+            d[6] = (wCrc&0x00ff);
+            for (int k = 0; k < 8; k++)
+            {
+                abyd[k] = d[k];
+            }
+            if (serial->isOpen())
+
+            {
+                //qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7]<<QTime::currentTime()<<QString::number((uchar)deviceInfo.m_abyAddr[1]);
+                serial->write(abyd);
+                QTimer::singleShot(1000, this,[=](){this->readDeviceData(deviceSbInfo);} );
+
+            }
+        }
+
+#if 0
         for (int j = 0; j < portInfo.m_pDeviceList->size(); j++)
         {
             DeviceInfo deviceInfo = portInfo.m_pDeviceList->operator[](j);
-            switch(portInfo.m_nDeviceType)
+            switch(/*portInfo.m_nDeviceType*/ deviceInfo.m_nDeviceType)
             {
                 case THC:
                 {
@@ -481,37 +631,52 @@ void MainWindow::SendMsgFunc()
             {
                 qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7]<<QTime::currentTime()<<QString::number((uchar)deviceInfo.m_abyAddr[1]);
                 serial->write(abyd);
+
             }
+
+
+
+
+            /* 枷锁，等收到或者超时后发送下一帧 */
+            /* 监测相邻两次的发送间隔 */
+
+            /*
             QTime t;
+            int i = 0;
             t.start();
             while(t.elapsed() < POLL_GAP)
             {
                 QCoreApplication::processEvents();
+
             }
+            */
+
+
 
         }
+#endif
     }
     return ;
 }
+
+
+
 
 /*
     函数功能:开启定时器，定时向下位机发送读数据请求
 */
 void MainWindow::on_pushButtonReadData_clicked()
 {
-    isRunFlag = !isRunFlag;
-    if (m_timer->isActive())
+    if (isRunFlag)
     {
-        disconnect(m_timer, SIGNAL(timeout()), this, SLOT(SendMsgFunc()));
-        m_timer->stop();
+        isRunFlag = false;
         ui->textEditTest->append("定时读取关闭");
         ui->pushButtonReadData->setText("定时读取开启");
-
     }
     else
     {
-        connect(m_timer, SIGNAL(timeout()), this, SLOT(SendMsgFunc()));
-        m_timer->start(m_nReadTimeGap);
+        isRunFlag = true;
+        QTimer::singleShot(1000, this, SLOT(SendMsgFunc()));
         ui->textEditTest->append("定时读取开启");
         ui->pushButtonReadData->setText("定时读取关闭");
     }
@@ -614,20 +779,65 @@ void MainWindow::on_pushButton_addChildDevice_clicked()
 */
 void MainWindow::on_pushButton_readSet_clicked()
 {
-    int nRet = 0;
-    nRet = ui->lineEdit_readSet->text().toInt();
-    if (nRet == 0)
+    float fRet = 0;
+    fRet = ui->lineEdit_readSet->text().toFloat();
+    if (fRet == 0)
     {
         ui->textEditTest->append("设置时间格式错误");
     }
-    else if(2>nRet || nRet>3600){
-        ui->textEditTest->append("设置时间范围出错(实际表数*2~3600)");
+    else if(0.5>fRet || fRet>60)
+    {
+        ui->textEditTest->append("设置时间范围出错 实际表数*(0.5~60)");
     }
-    else {
-        m_nReadTimeGap = nRet*1000;
-        ui->textEditTest->append("重设间隔为:" + QString::number(nRet) + "秒");
+    else
+    {
+        m_nReadTimeGap = fRet*1000;
+        ui->textEditTest->append("重设间隔为:" + QString::number(fRet) + "秒");
         on_pushButtonReadData_clicked();
         on_pushButtonReadData_clicked();
     }
+
+}
+/*
+    函数功能:设置gas qml中的属性
+*/
+#if 1
+void MainWindow::setQuickWidgetContextProperty()
+{
+    m_gasQuickForm->engine()->rootContext()->setContextProperty("quickWidth", m_gasQuickForm->width());
+    m_gasQuickForm->engine()->rootContext()->setContextProperty("quickHeight", m_gasQuickForm->height());
+
+}
+#endif
+
+/*
+    函数功能:瓦斯继电器监测
+*/
+void MainWindow::on_pushButton_clicked()
+{
+#if 0
+    if (m_gasForm == nullptr)
+    {
+        m_gasForm = new GasRelayMonitorForm;
+    }
+    m_gasForm->show();
+#endif
+    if (m_gasQuickForm == nullptr)
+    {
+        m_gasQuickForm = new MyQQuickWidget;
+        m_gasQuickForm->engine()->rootContext()->setContextProperty("gasValue", 0);
+        m_gasQuickForm->setFixedSize(800, 570);
+        m_gasQuickForm->setWindowTitle("瓦斯继电器智能监测系统");
+        m_gasQuickForm->engine()->rootContext()->setContextProperty("quickWidth", m_gasQuickForm->width());
+        m_gasQuickForm->engine()->rootContext()->setContextProperty("quickHeight", m_gasQuickForm->height());
+        m_gasQuickForm->setSource(QUrl("qrc:/gas.qml"));
+
+        connect(m_gasQuickForm, SIGNAL(setQuickWidgetContext()), this, SLOT(setQuickWidgetContextProperty()));
+
+        m_gasQuickForm->startRcv();
+
+
+    }
+    m_gasQuickForm->show();
 
 }

@@ -9,5 +9,10 @@
         <file>content/quit.png</file>
         <file>content/QuitButton.qml</file>
         <file>../image/gage.png</file>
+        <file>content/needle5.png</file>
+        <file>../image/gage3.png</file>
+        <file>content/nd4.png</file>
+        <file>gas.qml</file>
+        <file>../image/lanso.png</file>
     </qresource>
 </RCC>

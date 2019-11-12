@@ -39,6 +39,13 @@
 #define HM_CHK_ADDR(addr, count) {0x00, 0x04, 0xff, 0x00, 0x00, count}
 #define HM_CHK_DATA(addr, count) {addr, 0x04, 0x00, 0x00, 0x00, count}
 
+/* 设备信息，设备是由com口和设备号来标识的 */
+typedef struct deviceSymbolInfo
+{
+    int nComIndex;
+    int nDeviceIndex;
+}DeviceSymbolInfo;
+
 enum DeviceType{
 
     TYPE_NONE = 0,

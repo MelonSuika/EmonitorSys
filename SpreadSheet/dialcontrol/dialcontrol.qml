@@ -69,7 +69,8 @@ Rectangle {
     Dial {
         id: dial
         anchors.centerIn: parent
-        value: /*slider.x*/pressure * 100 / (container.width - 32)
+        value: /*slider.x*/density //* 100 / (container.width - 32)
+        //value: slider.x// * 100 / (container.width - 32)
     }
     //! [the dial in use]
 

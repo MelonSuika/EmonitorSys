@@ -44,6 +44,9 @@ SOURCES += \
     ./source/deviceinfo.cpp \
     ./source/addchilddeviceform.cpp \
     ./source/callout.cpp \
+    ./source/gasrelaymonitorform.cpp \
+    ./source/myqquickwidget.cpp \
+    ./source/rtmonitorform.cpp \
         spreadsheet/source/printview.cpp \
         spreadsheet/source/spreadsheet.cpp \
         spreadsheet/source/spreadsheetdelegate.cpp \
@@ -65,11 +68,15 @@ HEADERS += \
     ./include/deviceinfo.h \
     ./include/addchilddeviceform.h \
     ./include/callout.h \
+    ./include/gasrelaymonitorform.h \
+    ./include/myqquickwidget.h \
+    ./include/rtmonitorform.h \
         spreadsheet/include/printview.h \
         spreadsheet/include/spreadsheet.h \
         spreadsheet/include/spreadsheetdelegate.h \
         spreadsheet/include/spreadsheetitem.h   \
 
+UI_DIR=./ui
 FORMS += \
         ./ui/chartform.ui \
         ./ui/dashboardform.ui \
@@ -79,7 +86,9 @@ FORMS += \
         ./ui/rtchartform.ui \
         ./ui/rtdatasheetform.ui \
         ./ui/setdevicetypeform.ui \
-        ./ui/addchilddeviceform.ui
+        ./ui/addchilddeviceform.ui \
+        ./ui/gasrelaymonitorform.ui \
+        ./ui/rtmonitorform.ui
 
 #打印支持
 QT += printsupport
@@ -95,6 +104,7 @@ QT += quick
 QT += charts
 QT += quickwidgets
 QT += widgets
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

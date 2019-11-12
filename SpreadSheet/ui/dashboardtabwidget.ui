@@ -17,7 +17,7 @@
    <string>实时界面</string>
   </property>
   <property name="currentIndex">
-   <number>0</number>
+   <number>1</number>
   </property>
   <widget class="QWidget" name="tab_main">
    <attribute name="title">
@@ -37,6 +37,11 @@
    <attribute name="title">
     <string>监测界面</string>
    </attribute>
+   <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <item>
+     <layout class="QGridLayout" name="gridLayout_monitor"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QWidget" name="tab_sheet">
    <attribute name="title">

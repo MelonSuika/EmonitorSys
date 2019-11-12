@@ -23,10 +23,10 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>SF6Emonitor</string>
+   <string>SF6ESys</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../qrc/mainwindow.qrc">
+   <iconset resource="../dialcontrol/dialcontrol.qrc">
     <normaloff>:/image/lanso.png</normaloff>:/image/lanso.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -292,6 +292,13 @@
                    </property>
                   </widget>
                  </item>
+                 <item>
+                  <widget class="QPushButton" name="pushButton">
+                   <property name="text">
+                    <string>瓦斯继电器监测</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -355,9 +362,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../qrc/mainwindow.qrc"/>
-  <include location="../qrc/mainwindow.qrc"/>
-  <include location="../qrc/mainwindow.qrc"/>
+  <include location="../dialcontrol/dialcontrol.qrc"/>
  </resources>
  <connections/>
 </ui>

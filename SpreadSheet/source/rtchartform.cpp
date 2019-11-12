@@ -10,6 +10,8 @@
 #include "callout.h"
 #include <QGraphicsView>
 #include <QGraphicsScene>
+#include <QStringListModel>
+
 
 RtChartForm::RtChartForm(QWidget *parent) :
     QWidget(parent),
@@ -87,6 +89,7 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_ChartView->chart()->addAxis(m_dateTimeAxisX, Qt::AlignBottom);
     m_ChartView->chart()->setTheme(QtCharts::QChart::ChartThemeDark);
 
+
     /* Y轴(压力)设置 */
     m_axnisY = new QValueAxis;
     m_axnisY->setTitleText("压力(MPa)");
@@ -104,9 +107,6 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_axnisYDensity->setRange(-0.100, 0.900);
     m_axnisYDensity->setLabelFormat("%.3f");
     m_axnisYDensity->setTickCount(11);
-    //m_axnisYDensity->setLabelsColor(QColor(0, 0, 255));
-    //m_axnisYDensity->setLabelsVisible(true);
-    //m_axnisYDensity->hide();
     m_ChartView->chart()->addAxis(m_axnisYDensity, Qt::AlignLeft);
     m_ChartView->chart()->setAxisY(m_axnisYDensity, m_SeriesDensity);
 
@@ -116,17 +116,13 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_axnisYTemperature->setRange(-40.00, 70.00);
     m_axnisYTemperature->setLabelFormat("%.2f");
     m_axnisYTemperature->setTickCount(11);
-    //m_axnisYTemperature->setVisible(false);
     m_ChartView->chart()->addAxis(m_axnisYTemperature, Qt::AlignLeft);
     m_ChartView->chart()->setAxisY(m_axnisYTemperature, m_SeriesTemperature);
 
     /* 曲线绑定坐标轴 */
     m_Series->attachAxis(m_dateTimeAxisX);
-    m_Series->attachAxis(m_axnisY);
     m_SeriesDensity->attachAxis(m_dateTimeAxisX);
-    m_SeriesDensity->attachAxis(m_axnisYDensity);
     m_SeriesTemperature->attachAxis(m_dateTimeAxisX);
-    m_SeriesTemperature->attachAxis(m_axnisYTemperature);
 
     /* 副属性不可见，切换时可见 */
     //m_SeriesDensity->hide();
@@ -138,6 +134,19 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_ChartView->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     ui->verticalLayout_chart->addWidget(m_ChartView);
 
+    /* 曲线图外边框(白色区域)缩小,与layout相邻部分 */
+    m_ChartView->chart()->setContentsMargins(-8, -8, -8, -8);
+
+    /* 左右大窗横向比例 */
+    ui->gridLayout->setColumnStretch(0, 5);
+    ui->gridLayout->setColumnStretch(1, 1);
+
+    /* 报警框初始化 */
+    m_strlistAlert = new QStringList;
+    m_strListModelAlert = new QStringListModel;
+    m_strListModelAlert->setStringList(*m_strlistAlert);
+    m_strListModelAlert;
+    ui->listView_alert->setModel(m_strListModelAlert);
 
     m_nXIndex = 0;
 
@@ -170,7 +179,6 @@ RtChartForm::~RtChartForm()
 
 void RtChartForm::rcvRtData(QJsonObject *data, int nDeviceType)
 {
-    //qDebug()<<"eee"<<data->value("压力").toInt();
     int p = data->value("压力").toInt();
     int t = data->value("温度").toInt();
     int c = data->value("密度").toInt();
@@ -183,6 +191,15 @@ void RtChartForm::rcvRtData(QJsonObject *data, int nDeviceType)
         m_dateTimeAxisX->setMax(QDateTime::currentDateTime());
 
     }
+    if (p > 6000 || t > 6000 || c > 6000 && m_strListModelAlert->rowCount()<200)
+    {
+        QString str = QDateTime::currentDateTime().toString() + "压力:" + QString::number(p) + "密度:" + QString::number(c) + "温度:" + QString::number(t);
+        m_strListModelAlert->insertRow(m_strListModelAlert->rowCount());
+        QModelIndex index = m_strListModelAlert->index(m_strListModelAlert->rowCount()-1, 0);
+        m_strListModelAlert->setData(index, str, Qt::DisplayRole);
+
+    }
+
     m_Series->append(x, (float)p/10000 - 0.1);
     m_SeriesDensity->append(x, (float)c/10000 - 0.1);
     m_SeriesTemperature->append(x, (float)t/100);
@@ -225,21 +242,10 @@ void RtChartForm::on_pushButton_temperature_clicked()
 {
     if (m_SeriesTemperature->isVisible())
     {
-        //m_axnisY->setLabelFormat("%.3f");
-        //m_axnisY->setRange(-0.100, 0.900);
-
         m_SeriesTemperature->hide();
-        //m_SeriesDensity->hide();
-        //m_Series->show();
     }
     else
     {
-        //m_axnisY->setTitleText("温度(℃)");
-        //m_axnisY->setLabelFormat("%.2f");
-        //m_axnisY->setRange(-40.00, 70.00);
-
-        //m_Series->hide();
-        //m_SeriesDensity->hide();
         m_SeriesTemperature->show();
 
     }
@@ -250,18 +256,10 @@ void RtChartForm::on_pushButton_density_clicked()
 {
     if (m_SeriesDensity->isVisible())
     {
-        //m_axnisY->setRange(-0.100, 0.900);
         m_SeriesDensity->hide();
-        //m_SeriesTemperature->hide();
-        //m_Series->show();
     }
     else
     {
-        //m_axnisY->setTitleText("密度(MPa)");
-        //m_axnisY->setRange(-0.100, 0.900);
-
-       // m_Series->hide();
-        //m_SeriesTemperature->hide();
         m_SeriesDensity->show();
     }
 
@@ -284,8 +282,6 @@ void RtChartForm::on_pushButton_pressure_clicked()
     }
     else
     {
-        //m_SeriesTemperature->hide();
-        //m_SeriesDensity->hide();
         m_Series->show();
     }
 }

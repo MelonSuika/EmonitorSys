@@ -43,10 +43,12 @@ private:
 
     QChart *m_Chart;
     QChartView *m_ChartView;
+    /* 曲线 */
     QLineSeries *m_Series;
     QLineSeries *m_SeriesDensity;
     QSplineSeries *m_SeriesTemperature;
 
+    /* 坐标轴 */
     QValueAxis *m_axnisX;
     QValueAxis *m_axnisY;
     QValueAxis *m_axnisYDensity;
@@ -54,6 +56,9 @@ private:
     QCategoryAxis *m_Y;
     QDateTimeAxis *m_dateTimeAxisX;
 
+    /* 警报列表 */
+    QStringList *m_strlistAlert;
+    QStringListModel *m_strListModelAlert;
 
 protected:
     //void resizeEvent(QResizeEvent *event);

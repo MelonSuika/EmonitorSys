@@ -59,7 +59,7 @@ Item {
     Image {
         x:-220
         y:-220
-        source: "qrc:/../image/gage.png"
+        source: "qrc:/../image/gage3.png"
     }
 
 //! [needle_shadow]
@@ -69,21 +69,21 @@ Item {
         source: "needle_shadow.png"
         transform: Rotation {
             origin.x: 9; origin.y: 76
-            angle: needleRotation.angle
+            angle: needleRotation.angle - 100
         }
     }
 //! [needle_shadow]
 //! [needle]
     Image {
         id: needle
-        x: 20; y: -25
+        x: -104; y: 13
         antialiasing: true
-        source: "needle.png"
+        source: "nd4.png"
         transform: Rotation {
             id: needleRotation
-            origin.x: 5; origin.y: 65
+            origin.x: 128; origin.y: 16
             //! [needle angle]
-            angle: Math.min(Math.max(-130, root.value*2.6 - 130), 133)
+            angle: Math.min(Math.max(-47, root.value-47), 224)
             Behavior on angle {
                 SpringAnimation {
                     spring: 1.4
@@ -96,6 +96,7 @@ Item {
     }
 //! [needle]
 //! [overlay]
-    Image { x: -57; y: -40; source: "overlay.png" }
+    // overlay图标暂时不需要
+    Image { x: -57; y: -53; scale: 1.0;source: "1overlay.png" }
 //! [overlay]
 }

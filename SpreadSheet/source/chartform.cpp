@@ -31,6 +31,7 @@ ChartForm::ChartForm(QWidget *parent) :
     m_chart->addSeries(m_series);
     m_chart->createDefaultAxes();   //设置默认的坐标系，如果不设置程序是运行不了的
     m_chart->setTitle("曲线图");
+    //m_chart->setTheme(QChart::ChartTheme::ChartThemeDark);
 
     /* 画坐标轴X */
     QValueAxis *axisX = new QValueAxis;

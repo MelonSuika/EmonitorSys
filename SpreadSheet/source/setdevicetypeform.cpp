@@ -74,6 +74,11 @@ void SetDeviceTypeForm::Create(QList<SerialPortInfo> *pComlist)
 }
 
 
+
+/*
+    SetDeviceTypeForm暂时废弃
+
+*/
 void SetDeviceTypeForm::on_pushButton_clicked()
 {
     for (int i = 0; i < m_pComlist->size(); i++)
