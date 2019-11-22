@@ -4,5 +4,6 @@
         <file>../qss/widget-black.qss</file>
         <file>../qss/widget-blue.qss</file>
         <file>../image/lanso.png</file>
+        <file>../qss/widget-darkOrange.qss</file>
     </qresource>
 </RCC>

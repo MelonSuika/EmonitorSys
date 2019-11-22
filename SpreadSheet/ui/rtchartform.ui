@@ -127,8 +127,7 @@
             <item row="4" column="0">
              <widget class="QListView" name="listView_alert">
               <property name="styleSheet">
-               <string notr="true">background-color: rgb(68, 69, 73);
-color: rgb(255, 255, 255);</string>
+               <string notr="true"/>
               </property>
              </widget>
             </item>

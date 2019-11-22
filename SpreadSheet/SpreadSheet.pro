@@ -47,6 +47,10 @@ SOURCES += \
     ./source/gasrelaymonitorform.cpp \
     ./source/myqquickwidget.cpp \
     ./source/rtmonitorform.cpp \
+    ./source/singledashform.cpp \
+    ./source/singledash.cpp \
+    ./source/pagenavigator.cpp \
+    ./source/aboutform.cpp \
         spreadsheet/source/printview.cpp \
         spreadsheet/source/spreadsheet.cpp \
         spreadsheet/source/spreadsheetdelegate.cpp \
@@ -71,6 +75,11 @@ HEADERS += \
     ./include/gasrelaymonitorform.h \
     ./include/myqquickwidget.h \
     ./include/rtmonitorform.h \
+    ./include/singledashform.h \
+    ./include/singledash.h \
+    ./include/pagenavigator.h \
+    ./include/loadqss.h \
+    ./include/aboutform.h \
         spreadsheet/include/printview.h \
         spreadsheet/include/spreadsheet.h \
         spreadsheet/include/spreadsheetdelegate.h \
@@ -88,7 +97,10 @@ FORMS += \
         ./ui/setdevicetypeform.ui \
         ./ui/addchilddeviceform.ui \
         ./ui/gasrelaymonitorform.ui \
-        ./ui/rtmonitorform.ui
+        ./ui/rtmonitorform.ui \
+        ./ui/singledashform.ui \
+        ./ui/pagenavigator.ui \
+        ./ui/aboutform.ui
 
 #打印支持
 QT += printsupport
@@ -125,9 +137,12 @@ DISTFILES += \
     image/gage.png \
     image/lanso.png \
     qss/widget-black.qss \
-    qss/widget-blue.qss
+    qss/widget-blue.qss \
+    qss/widget-darkOrange.qss
 
 RESOURCES += \
     dialcontrol/dialcontrol.qrc \
-    ./qrc/mainwindow.qrc
+    ./qrc/mainwindow.qrc \
+    ./qrc/icon.qrc
 
+RC_ICONS += :/../image/bitbug_favicon_128.ico

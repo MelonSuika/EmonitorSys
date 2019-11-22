@@ -14,8 +14,9 @@ RtDataSheetForm::RtDataSheetForm(QWidget *parent) :
 
     /* 设置列名 */
     QStringList headers;
-    headers<< "表号"<<"温度"<<"压力"<<"密度"<<"位置";
+    headers<< "表号"<<"温度(℃)"<<"压力(MPa)"<<"密度(MPa)"<<"位置信息";
     ui->tableWidget->setHorizontalHeaderLabels(headers);
+
 
 }
 
@@ -24,8 +25,11 @@ RtDataSheetForm::~RtDataSheetForm()
     delete ui;
 }
 
-void RtDataSheetForm::rcvRtData(QJsonObject *data, int nDeviceType)
+void RtDataSheetForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
 {
+    if (deviceSbInfo.nDeviceIndex > 0)
+        return;
+
 
 
 }

@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include "spreadsheet.h"
-#include <QSerialPort>
 #include "console.h"
 #include <QSqlQuery>
 #include <QDebug>
@@ -16,11 +15,19 @@
 #include "addchilddeviceform.h"
 #include "gasrelaymonitorform.h"
 #include "myqquickwidget.h"
+#include "dashboardtabwidget.h"
+#include "aboutform.h"
 
 
 namespace Ui {
 class MainWindow;
 }
+
+enum OutPutWidget{
+    textEditPrint = 0,
+    textEditDisplay,
+    textEditConnectInfo
+};
 
 class MainWindow : public QMainWindow
 {
@@ -33,11 +40,16 @@ public:
 
 
 signals:
-    void sendRtData(QJsonObject *data, int deviceType);
+    void sendRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo);
     void sigSendMsg(int nIndex);
     void sigDelayRead(int nIndex);
 
 private slots:
+
+    void mainWidgetPrint(QString info, int outPutWidget);
+
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result);
+
     void errorFunc(QSerialPort::SerialPortError err);
 
     void on_pushButtonSheet_clicked();
@@ -74,7 +86,15 @@ private slots:
 
     void readDeviceData(DeviceSymbolInfo deviceSbInfo);
 
+    void upDateComComboBox();
 
+    void on_actionblue_triggered();
+
+    void on_actionblack_triggered();
+
+    void on_actionabout_triggered();
+
+    void on_actionOrange_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -108,6 +128,8 @@ private:
     QPointer<GasRelayMonitorForm> m_gasForm;
     /* 瓦斯继电器监测界面 */
     QPointer<MyQQuickWidget> m_gasQuickForm;
+    /* 关于界面 */
+    QPointer<AboutForm> m_aboutFrom;
 
     QList<SerialPortInfo> *m_pComlist;
     int m_nComCount;

@@ -7,15 +7,7 @@ DataSheetForm::DataSheetForm(QWidget *parent) :
     ui(new Ui::DataSheetForm)
 {
     ui->setupUi(this);
-    /* 加载qss改变界面风格 */
-    QFile qssfile(":/qss/widget-blue.qss");
-    qssfile.open(QFile::ReadOnly);
-    QString qss;
-    qss = qssfile.readAll();
-    this->setStyleSheet(qss);
 
-
-    //ui->tableView_Sheet.setro
     m_model = nullptr;
 
     if (m_model != nullptr)

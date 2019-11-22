@@ -19,6 +19,7 @@
 #include <QEvent>
 #include <QResizeEvent>
 #include "myqquickwidget.h"
+#include "loadqss.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,17 +36,13 @@ MainWindow::MainWindow(QWidget *parent) :
     m_delayTimer        = new QTimer(this);
     //m_delayReadTimer    = new QTimer(this);
     //m_gasTimer          = new QTimer(this);
+    m_nComCount = 0;
 
     /* 加载qss改变界面风格 */
-    QFile qssfile(":/qss/widget-blue.qss");
-    qssfile.open(QFile::ReadOnly);
-    QString qss;
-    qss = qssfile.readAll();
-    this->setStyleSheet(qss);
+    LoadQss::loadQss(SKIN_ORANGE);
 
-
-    /* textEditDebug防止信息太多崩溃 */
-    ui->textEditDebug->document()->setMaximumBlockCount(100);
+    /* textEditConnectInfo防止信息太多崩溃 */
+    ui->textEditConnectInfo->document()->setMaximumBlockCount(100);
 
 
     /* COM监测相关初始化 */
@@ -66,13 +63,13 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->comboBoxIsActiveCom->addItem(info.portName());
             //关闭串口等待人为(打开串口按钮)打开
             serialPortInfo.m_serial->close();
-            //connect(serialPortInfo.m_serial, SIGNAL(readyRead()), this, SLOT(comDelay()));
-
             m_nComCount++;
         }
     }
-    //connect(m_delayTimer, SIGNAL(timeout()), this, SLOT(readData()));
-
+    if (m_nComCount == 0)
+    {
+        ui->comboBoxIsActiveCom->addItem("无端口连接");
+    }
 
     /* 定时间隔设置下拉初始化 */
 
@@ -90,6 +87,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_setForm = nullptr;
     m_addForm = nullptr;
     m_gasQuickForm = nullptr;
+    m_aboutFrom = nullptr;
     m_nCount = 0;
     m_nReadTimeGap = 5000;
 
@@ -140,25 +138,25 @@ void MainWindow::on_pushButtonSerial_clicked()
         if (false == serial->isOpen())
         {
             serial->setPortName(serial->portName());
-            serial->setBaudRate(9600);
+            serial->setBaudRate(QSerialPort::Baud9600);
             serial->setDataBits(QSerialPort::Data8);
             serial->setParity(QSerialPort::NoParity);
             serial->setStopBits(QSerialPort::OneStop);
             serial->setFlowControl(QSerialPort::NoFlowControl);
             if (serial ->open(QIODevice::ReadWrite))
             {
-                ui->textEditTest->append("Open serial " + serial->portName() + " success");
+                mainWidgetPrint("Open serial " + serial->portName() + " success", textEditPrint);
                 ui->pushButtonSerial->setText("关闭串口");
             }
             else
             {
-                ui->textEditTest->append("Open serial " + serial->portName() + " fail");
+                mainWidgetPrint("Open serial " + serial->portName() + " fail", textEditPrint);
             }
         }
         else
         {
             serial->close();
-            ui->textEditTest->append("close serial " + serial->portName() + " success");
+            ui->textEditPrint->append("close serial " + serial->portName() + " success");
             ui->pushButtonSerial->setText("打开串口");
             /* 停止定时器 */
             m_timer->stop();
@@ -168,7 +166,7 @@ void MainWindow::on_pushButtonSerial_clicked()
     }
     if (0 == nCntCom)
     {
-        ui->textEditTest->append("无串口连接");
+        ui->textEditPrint->append("无串口连接");
     }
 
 }
@@ -213,7 +211,7 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
 
         if (portInfo.m_nDeviceType == TYPE_NONE)
         {
-            ui->textEditTest->append(portInfo.m_serial->portName() + "未设置协议类型");
+            ui->textEditPrint->append(portInfo.m_serial->portName() + "未设置协议类型");
             continue;
         }
         if (serial->isOpen())
@@ -252,16 +250,16 @@ void MainWindow::on_pushButtonWriteSerialPort_clicked()
             {
                 serial->write(abyd);
             }
-            ui->textEditTest->append(serial->portName() + " send to lower" + " " + abyd.toHex());
+            ui->textEditPrint->append(serial->portName() + " send to lower" + " " + abyd.toHex());
         }
         else
         {
-            ui->textEditTest->setText("串口 " + serial->portName() + " 未打开");
+            ui->textEditPrint->setText("串口 " + serial->portName() + " 未打开");
         }
     }
     if (m_pComlist->size() == 0)
     {
-        ui->textEditTest->append("无串口连接");
+        ui->textEditPrint->append("无串口连接");
     }
 }
 
@@ -357,6 +355,11 @@ void MainWindow::readData()
             for (int j = 0; j < serialPortInfo->m_pDeviceList->size(); j++)
             {
                 DeviceInfo info = serialPortInfo->m_pDeviceList->operator[](j);
+
+                DeviceSymbolInfo deviceSbInfo;
+                deviceSbInfo.nComIndex = i;
+                deviceSbInfo.nDeviceIndex = j;
+                deviceSbInfo.nDeviceType = info.m_nDeviceType;
                 qDebug()<<"addr"<<QString::number((uchar)data[0]);
                 qDebug()<<"info"<<QString::number(info.m_abyAddr[1]);
                 if (info.m_abyAddr[1] == data[0])
@@ -367,8 +370,8 @@ void MainWindow::readData()
                 if (serialPortInfo->m_nDeviceType == THC)
                 {
                     analysisTH(data, tOut, hOut);
-                    ui->textEditTest->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100) + "湿度:" + QString::number(hOut/100) + "." + QString::number(hOut%100));
-                    ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+                    ui->textEditPrint->setText(serial->portName() + "温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100) + "湿度:" + QString::number(hOut/100) + "." + QString::number(hOut%100));
+                    ui->textEditConnectInfo->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
                     /* 插入数据库 */
                     if(!m_sqlQuery.exec("INSERT INTO TH3 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(tOut) + ", " + QString::number(hOut) +  ")"))
                     {
@@ -387,17 +390,17 @@ void MainWindow::readData()
                     analysisHM100PR(data, tOut, pOut, cOut);
                     if (j < serialPortInfo->m_pDeviceList->size() - 1)
                     {
-                        ui->textEditTest->append(serial->portName() + "(" + QString::number((uchar)info.m_abyAddr[1]) + ")温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+                        ui->textEditPrint->append(serial->portName() + "(" + QString::number((uchar)info.m_abyAddr[1]) + ")温度:" + QString::number((double)tOut/100)
                                                   + "压力:" + QString::number(pOut)
                                                   + "密度:" + QString::number(cOut));
                     }
                     else
                     {
-                        ui->textEditTest->setText(serial->portName() + "(" + QString::number((uchar)info.m_abyAddr[1]) + ")温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+                        ui->textEditPrint->setText(serial->portName() + "(" + QString::number((uchar)info.m_abyAddr[1]) + ")温度:" + QString::number((double)tOut/100)
                                                   + "压力:" + QString::number(pOut)
                                                   + "密度:" + QString::number(cOut));
                     }
-                    ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+                    ui->textEditConnectInfo->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
                     obj->insert("温度", tOut);
                     obj->insert("压力", pOut);
                     obj->insert("密度", cOut);
@@ -414,7 +417,7 @@ void MainWindow::readData()
                     }
                 }
                 /* 温湿度数据插入数据库后，发送信号更新表盘 */
-                emit sendRtData(obj, serialPortInfo->m_nDeviceType);
+                emit sendRtData(obj, deviceSbInfo);
             }
         }
         /* 读到的是设备地址 */
@@ -441,7 +444,7 @@ void MainWindow::readData()
                     deviceInfo.m_abyAddr[0] = adrData[3];
                     deviceInfo.m_abyAddr[1] = adrData[4];
                     serialPortInfo->m_pDeviceList->append(deviceInfo);
-                    ui->textEditTest->append(serial->portName() + "添加新设备地址成功" + deviceInfo.m_abyAddr.toHex());
+                    ui->textEditPrint->append(serial->portName() + "添加新设备地址成功" + deviceInfo.m_abyAddr.toHex());
                 }
             }
 #endif
@@ -469,8 +472,8 @@ void readData2(QSerialPort *serial)
 
 /*
     函数功能: 读取指定设备数据
-    实际上对于上位机，只有com口之分，指定的nIndex只是
-    每个com口中连接添加的设备
+    实际上对于上位机，只有com口之分，指定的nIndex只是逻辑上
+    每个com口中连接添加的设备序号
 */
 void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
 {
@@ -489,7 +492,7 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
         {
             pCurInfo->m_nReadErrorCount++;
             QTimer::singleShot(500, this, [=](){readDeviceData(deviceSbInfo);});
-            ui->textEditTest->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")读取异常");
+            ui->textEditPrint->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")读取异常");
         }
         else
         {
@@ -502,12 +505,12 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
 
     analysisHM100PR(data, tOut, pOut, cOut);
 
-    ui->textEditTest->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")温度:" + QString::number(tOut/100) + "." + QString::number(tOut%100)
+    ui->textEditPrint->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")温度:" + QString::number((double)tOut/100)
                               + "压力:" + QString::number(pOut)
                               + "密度:" + QString::number(cOut));
 
 
-    ui->textEditDebug->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+    ui->textEditConnectInfo->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
     QJsonObject obj;
     obj.insert("温度", tOut);
     obj.insert("压力", pOut);
@@ -524,9 +527,9 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
         qDebug() << "inserted value 015,25,25!";
     }
     /* 温湿度数据插入数据库后，发送信号更新表盘 */
-    if (deviceSbInfo.nDeviceIndex == 0)
+    //if (deviceSbInfo.nDeviceIndex == 0)
     {
-        emit sendRtData(&obj, serialPortInfo->m_nDeviceType);
+        emit sendRtData(&obj, deviceSbInfo);
     }
 
     QTimer::singleShot(0, this, [=](){SendMsgFunc(deviceSbInfo.nDeviceIndex+1);});
@@ -546,6 +549,7 @@ void MainWindow::SendMsgFunc(int nIndex)
         DeviceSymbolInfo deviceSbInfo;
         deviceSbInfo.nComIndex = i;
         deviceSbInfo.nDeviceIndex = nIndex;
+
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         SerialPortInfo portInfo = m_pComlist->at(i);
         unsigned short wCrc = 0;
@@ -562,11 +566,11 @@ void MainWindow::SendMsgFunc(int nIndex)
         {
             QTimer::singleShot(0, this, [=](){SendMsgFunc(0);});
             return;
-
         }
         else
         {
             DeviceInfo deviceInfo = portInfo.m_pDeviceList->operator[](nIndex);
+            deviceSbInfo.nAddress = deviceInfo.m_abyAddr[1];
             switch(deviceInfo.m_nDeviceType)
             {
                 case THC:
@@ -635,8 +639,6 @@ void MainWindow::SendMsgFunc(int nIndex)
             }
 
 
-
-
             /* 枷锁，等收到或者超时后发送下一帧 */
             /* 监测相邻两次的发送间隔 */
 
@@ -651,15 +653,11 @@ void MainWindow::SendMsgFunc(int nIndex)
             }
             */
 
-
-
         }
 #endif
     }
     return ;
 }
-
-
 
 
 /*
@@ -670,14 +668,14 @@ void MainWindow::on_pushButtonReadData_clicked()
     if (isRunFlag)
     {
         isRunFlag = false;
-        ui->textEditTest->append("定时读取关闭");
+        mainWidgetPrint("定时读取关闭", textEditPrint);
         ui->pushButtonReadData->setText("定时读取开启");
     }
     else
     {
         isRunFlag = true;
         QTimer::singleShot(1000, this, SLOT(SendMsgFunc()));
-        ui->textEditTest->append("定时读取开启");
+        mainWidgetPrint("定时读取开启", textEditPrint);
         ui->pushButtonReadData->setText("定时读取关闭");
     }
 
@@ -688,15 +686,15 @@ void MainWindow::on_pushButtonReadData_clicked()
 */
 void MainWindow::on_pushButtonConnectInfo_clicked()
 {
-    ui->textEditDebug->append(QDateTime::currentDateTime().toString());
-    ui->textEditDebug->append("COM连接数:" + QString::number(QSerialPortInfo::availablePorts().size()));
+    mainWidgetPrint(QDateTime::currentDateTime().toString(), textEditConnectInfo);
+    mainWidgetPrint("COM连接数:" + QString::number(QSerialPortInfo::availablePorts().size()), textEditConnectInfo);
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
     {
-        ui->textEditDebug->append("Name:" + info.portName());
-        ui->textEditDebug->append("Description : " + info.description());
-        ui->textEditDebug->append("Manufacturer: " + info.manufacturer());
-        ui->textEditDebug->append("Serial Number: " + info.serialNumber());
-        ui->textEditDebug->append("System Location: " + info.systemLocation());
+        mainWidgetPrint("Name:" + info.portName(), textEditConnectInfo);
+        mainWidgetPrint("Description : " + info.description(), textEditConnectInfo);
+        mainWidgetPrint("Manufacturer: " + info.manufacturer(), textEditConnectInfo);
+        mainWidgetPrint("Serial Number: " + info.serialNumber(), textEditConnectInfo);
+        mainWidgetPrint("System Location: " + info.systemLocation(), textEditConnectInfo);
     }
 }
 
@@ -722,7 +720,7 @@ void MainWindow::on_pushButton_dashBoard_clicked()
     if (m_dBwdgt == nullptr)
     {
         m_dBwdgt = new DashBoardTabWidget;
-        connect(this, SIGNAL(sendRtData(QJsonObject *, int)), m_dBwdgt, SLOT(rcvRtData(QJsonObject *, int)));
+        connect(this, SIGNAL(sendRtData(QJsonObject *, DeviceSymbolInfo)), m_dBwdgt, SLOT(rcvRtData(QJsonObject *, DeviceSymbolInfo)));
 
     }
     m_dBwdgt->show();
@@ -783,16 +781,16 @@ void MainWindow::on_pushButton_readSet_clicked()
     fRet = ui->lineEdit_readSet->text().toFloat();
     if (fRet == 0)
     {
-        ui->textEditTest->append("设置时间格式错误");
+        mainWidgetPrint("设置时间格式错误", textEditPrint);
     }
     else if(0.5>fRet || fRet>60)
     {
-        ui->textEditTest->append("设置时间范围出错 实际表数*(0.5~60)");
+        mainWidgetPrint("设置时间范围出错 实际表数*(0.5~60)", textEditPrint);
     }
     else
     {
         m_nReadTimeGap = fRet*1000;
-        ui->textEditTest->append("重设间隔为:" + QString::number(fRet) + "秒");
+        mainWidgetPrint("重设间隔为:" + QString::number(fRet) + "秒", textEditPrint);
         on_pushButtonReadData_clicked();
         on_pushButtonReadData_clicked();
     }
@@ -841,3 +839,101 @@ void MainWindow::on_pushButton_clicked()
     m_gasQuickForm->show();
 
 }
+
+void MainWindow::on_actionblue_triggered()
+{
+    LoadQss::loadQss(SKIN_BLUE);
+}
+
+void MainWindow::on_actionblack_triggered()
+{
+    LoadQss::loadQss(SKIN_DARK);
+}
+
+void MainWindow::on_actionOrange_triggered()
+{
+    LoadQss::loadQss(SKIN_ORANGE);
+}
+
+void MainWindow::on_actionabout_triggered()
+{
+    if (nullptr == m_aboutFrom)
+    {
+        m_aboutFrom = new AboutForm();
+    }
+    m_aboutFrom->show();
+
+}
+
+bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *result)
+{
+
+    if (eventType == QByteArray("windows_generic_MSG"))
+    {
+        MSG *pMsg = reinterpret_cast<MSG*>(message);
+        if(pMsg->message == WM_DEVICECHANGE)
+        {
+            switch(pMsg->wParam)
+            {
+            //设备连上
+            case /*DBT_DEVICEARRIVAL*/0x8000:
+                mainWidgetPrint("有新端口接入", textEditDisplay);
+                upDateComComboBox();
+                break;
+            //设备断开
+            case /*DBT_DEVICEREMOVECOMPLETE*/0x8004:
+                mainWidgetPrint("有端口断开", textEditDisplay);
+                upDateComComboBox();
+                break;
+            //其他的消息可以查看“Dbt.h”文件
+            default:
+                break;
+            }
+        }
+
+    }
+    return QWidget::nativeEvent(eventType, message, result);
+}
+
+
+/*
+    函数功能：打印输出至主界面窗口选择
+*/
+void MainWindow::mainWidgetPrint(QString info, int outPutWidget)
+{
+    switch (outPutWidget) {
+        case textEditPrint:
+            ui->textEditPrint->append(info);
+            break;
+        case textEditDisplay:
+            ui->textEditRcvDisplay->append(info);
+            break;
+        case textEditConnectInfo:
+            ui->textEditConnectInfo->append(info);
+            break;
+        default:
+            break;
+    }
+
+}
+
+/*
+    函数功能: 更新主界面的ComComboBox
+*/
+void MainWindow::upDateComComboBox()
+{
+    int nCount = 0;
+    ui->comboBoxIsActiveCom->clear();
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+    {
+        nCount++;
+        ui->comboBoxIsActiveCom->addItem(info.portName());
+    }
+    if (nCount == 0)
+    {
+        ui->comboBoxIsActiveCom->addItem("无连接端口");
+    }
+
+}
+
+

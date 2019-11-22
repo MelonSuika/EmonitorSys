@@ -7,27 +7,23 @@
     <x>0</x>
     <y>0</y>
     <width>840</width>
-    <height>570</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>840</width>
-    <height>570</height>
+    <height>600</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>840</width>
-    <height>570</height>
+    <height>610</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>SF6ESys</string>
-  </property>
-  <property name="windowIcon">
-   <iconset resource="../dialcontrol/dialcontrol.qrc">
-    <normaloff>:/image/lanso.png</normaloff>:/image/lanso.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -57,7 +53,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QTextEdit" name="textEditTest">
+           <widget class="QTextEdit" name="textEditPrint">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -80,7 +76,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QTextEdit" name="textEditDebug"/>
+           <widget class="QTextEdit" name="textEditConnectInfo"/>
           </item>
           <item>
            <spacer name="verticalSpacer">
@@ -350,19 +346,89 @@
     </item>
    </layout>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>840</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>功能</string>
+    </property>
+    <widget class="QMenu" name="menu_selectSkin">
+     <property name="title">
+      <string>换肤</string>
+     </property>
+     <addaction name="actionblack"/>
+     <addaction name="separator"/>
+     <addaction name="actionblue"/>
+     <addaction name="separator"/>
+     <addaction name="actionOrange"/>
+    </widget>
+    <addaction name="menu_selectSkin"/>
+   </widget>
+   <widget class="QMenu" name="menu_help">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+    <addaction name="actionabout"/>
+    <addaction name="separator"/>
+    <addaction name="actionBug"/>
+    <addaction name="separator"/>
+    <addaction name="actionIntroduce"/>
+    <addaction name="separator"/>
+    <addaction name="actionLog"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_help"/>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>蓝白</string>
+   </property>
+  </action>
+  <action name="actionblack">
+   <property name="text">
+    <string> 黑白</string>
+   </property>
+  </action>
+  <action name="actionblue">
+   <property name="text">
+    <string>蓝白</string>
+   </property>
+  </action>
+  <action name="actionabout">
+   <property name="text">
+    <string>关于软件</string>
+   </property>
+  </action>
+  <action name="actionBug">
+   <property name="text">
+    <string>上报bug</string>
+   </property>
+  </action>
+  <action name="actionIntroduce">
+   <property name="text">
+    <string>使用说明</string>
+   </property>
+  </action>
+  <action name="actionLog">
+   <property name="text">
+    <string>日志</string>
+   </property>
+  </action>
+  <action name="actionOrange">
+   <property name="text">
+    <string>暗橘(默认)</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="../dialcontrol/dialcontrol.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

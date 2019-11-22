@@ -2,6 +2,7 @@
 #define RTDATASHEETFORM_H
 
 #include <QWidget>
+#include "common.h"
 
 namespace Ui {
 class RtDataSheetForm;
@@ -16,7 +17,7 @@ public:
     ~RtDataSheetForm();
 
 private slots:
-    void rcvRtData(QJsonObject *, int);
+    void rcvRtData(QJsonObject *, DeviceSymbolInfo );
 private:
     Ui::RtDataSheetForm *ui;
 };

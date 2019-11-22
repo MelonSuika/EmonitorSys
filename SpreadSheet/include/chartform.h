@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "common.h"
 #include <QDateTime>
-
+#include "rtchartform.h"
 
 namespace Ui {
 class ChartForm;

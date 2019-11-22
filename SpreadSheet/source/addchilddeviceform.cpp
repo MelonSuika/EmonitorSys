@@ -7,14 +7,6 @@ AddChildDeviceForm::AddChildDeviceForm(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /* 加载qss改变界面风格 */
-    QFile qssfile(":/qss/widget-blue.qss");
-    qssfile.open(QFile::ReadOnly);
-    QString qss;
-    qss = qssfile.readAll();
-    this->setStyleSheet(qss);
-
-
     ui->tableWidget->setRowCount(30); //设置行数为20
     ui->tableWidget->setColumnCount(5);
 
@@ -87,6 +79,7 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
         bool flag = false;
         QString str = ui->lineEdit_addr->text();
         int nDType = comtextToType(ui->comboBox_type->currentText());
+        /* 未选类型，警告并返回 */
         if (nDType == TYPE_NONE)
         {
             QMessageBox::warning(NULL, QStringLiteral("警告"), QStringLiteral("请选择设备类型"), QMessageBox::Ok);
@@ -118,6 +111,7 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
             info.m_abyAddr[0] = 0;
             info.m_abyAddr[1] = n;
             info.m_nDeviceType = nDType;
+
             qDebug()<<"新增地址为:"<<QString::number(info.m_abyAddr[0], 16)<<QString::number((uchar)info.m_abyAddr[1], 16);
             m_pComlist->operator[](i).m_pDeviceList->append(info);
             for (int k = 0; ; k++)

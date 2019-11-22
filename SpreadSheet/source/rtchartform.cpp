@@ -177,8 +177,10 @@ RtChartForm::~RtChartForm()
     delete ui;
 }
 
-void RtChartForm::rcvRtData(QJsonObject *data, int nDeviceType)
+void RtChartForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
 {
+    if (deviceSbInfo.nDeviceIndex > 0)
+        return;
     int p = data->value("压力").toInt();
     int t = data->value("温度").toInt();
     int c = data->value("密度").toInt();

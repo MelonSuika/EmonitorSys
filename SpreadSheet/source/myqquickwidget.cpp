@@ -33,5 +33,4 @@ void MyQQuickWidget::startRcv()
 
     m_gasTimer->start(1000);
 
-
 }

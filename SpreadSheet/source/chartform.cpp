@@ -13,14 +13,6 @@ ChartForm::ChartForm(QWidget *parent) :
     /* point list */
     m_vectorPoint = new QVector<QPointF>;
 
-    /* 加载qss改变界面风格 */
-    QFile qssfile(":/qss/widget-blue.qss");
-    qssfile.open(QFile::ReadOnly);
-    QString qss;
-    qss = qssfile.readAll();
-    this->setStyleSheet(qss);
-
-
     m_series = new QSplineSeries();
     m_series->setPen(QPen(Qt::blue,1,Qt::SolidLine)); //设置画笔
 

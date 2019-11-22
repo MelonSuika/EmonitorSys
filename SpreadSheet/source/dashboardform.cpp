@@ -20,13 +20,6 @@ DashBoardForm::DashBoardForm(QWidget *parent) :
         ui->comboBox_com->addItem(info.portName());
     }
 
-    /* 加载qss改变界面风格 */
-    QFile qssfile(":/qss/widget-black.qss");
-    qssfile.open(QFile::ReadOnly);
-    QString qss;
-    qss = qssfile.readAll();
-    this->setStyleSheet(qss);
-
     /* 加载表盘 */
     m_quickWidget = new QQuickWidget;
     m_quickWidget->setSource(QUrl("qrc:/dialcontrol.qml"));
@@ -38,7 +31,7 @@ DashBoardForm::DashBoardForm(QWidget *parent) :
     /* chart */
     m_chartForm = new RtChartForm;
     ui->gridLayout_chart->addWidget(m_chartForm);
-    connect(this, SIGNAL(sendToMChart(QJsonObject *, int)), m_chartForm, SLOT(rcvRtData(QJsonObject *, int)));
+    connect(this, SIGNAL(sendToMChart(QJsonObject *, DeviceSymbolInfo)), m_chartForm, SLOT(rcvRtData(QJsonObject *, DeviceSymbolInfo)));
 
     ui->pushButton_rtDisplay->hide();
 
@@ -58,12 +51,14 @@ DashBoardForm::~DashBoardForm()
 }
 
 
-void DashBoardForm::rcvRtData(QJsonObject *data, int nDeviceType)
+void DashBoardForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
 {
+    if (deviceSbInfo.nDeviceIndex > 0)
+        return;
     QString str = ui->lineEdit_address->text();
     if (str == "" || str == QString::number(data->value("地址").toInt()))
     {
-        emit sendToMChart(data, nDeviceType);
+        emit sendToMChart(data, deviceSbInfo);
         int t = data->value("温度").toInt();
         int p = data->value("压力").toInt();
         int c = data->value("密度").toInt();

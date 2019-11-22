@@ -7,13 +7,6 @@ SetDeviceTypeForm::SetDeviceTypeForm(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /* 加载qss改变界面风格 */
-    QFile qssfile(":/qss/widget-blue.qss");
-    qssfile.open(QFile::ReadOnly);
-    QString qss;
-    qss = qssfile.readAll();
-    this->setStyleSheet(qss);
-
 #if 1
     ui->tableWidget->setRowCount(20); //设置行数为20
     ui->tableWidget->setColumnCount(5);

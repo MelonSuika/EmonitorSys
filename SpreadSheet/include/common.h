@@ -2,6 +2,9 @@
 #define COMMON_H
 
 #define COM_COUNT_MAX 128
+#include <QApplication>
+#include <QDebug>
+#include <QMessageBox>
 
 #include <QSqlError>
 #include <QSqlQuery>
@@ -22,13 +25,7 @@
 #include <QPointer>
 
 #include <QJsonObject>
-
-#include "dashboardform.h"
-#include "dashboardtabwidget.h"
-
-#include "rtdatasheetform.h"
-#include "rtchartform.h"
-
+#include <QQuickWidget>
 
 
 /* 温湿度传感器 */
@@ -44,6 +41,8 @@ typedef struct deviceSymbolInfo
 {
     int nComIndex;
     int nDeviceIndex;
+    int nAddress;
+    int nDeviceType;
 }DeviceSymbolInfo;
 
 enum DeviceType{
@@ -61,6 +60,11 @@ enum DeviceType{
 
 /* 轮询间隔 */
 #define POLL_GAP 500
+
+/* 皮肤 */
+#define SKIN_BLUE ":/qss/widget-blue.qss"
+#define SKIN_DARK ":/qss/widget-black.qss"
+#define SKIN_ORANGE ":/qss/widget-darkOrange.qss"
 
 int comtextToType(QString str);
 
