@@ -138,6 +138,9 @@ private:
 
     int m_nReadTimeGap;
 
+    /* 收发统计 */
+    int m_nRcvCount;
+    int m_nSendCount;
 
     int m_test;
 

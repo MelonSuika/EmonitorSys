@@ -97,10 +97,18 @@
           </property>
           <layout class="QGridLayout" name="gridLayout_selectInfo" rowstretch="2,0,0,0,0,0" columnstretch="3,0,0">
            <item row="3" column="1">
-            <widget class="QDateTimeEdit" name="dateTimeEdit_start"/>
+            <widget class="QDateTimeEdit" name="dateTimeEdit_start">
+             <property name="displayFormat">
+              <string>yyyy-MM-dd HH:mm</string>
+             </property>
+            </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QDateTimeEdit" name="dateTimeEdit_end"/>
+            <widget class="QDateTimeEdit" name="dateTimeEdit_end">
+             <property name="displayFormat">
+              <string>yyyy-MM-dd HH:mm</string>
+             </property>
+            </widget>
            </item>
            <item row="3" column="0">
             <widget class="QLabel" name="label">

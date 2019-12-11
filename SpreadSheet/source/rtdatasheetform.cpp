@@ -30,6 +30,4 @@ void RtDataSheetForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo
     if (deviceSbInfo.nDeviceIndex > 0)
         return;
 
-
-
 }

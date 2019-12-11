@@ -56,6 +56,13 @@ ChartForm::ChartForm(QWidget *parent) :
     m_nEnd = 19;
     m_chart->axisY()->setMin(0);
 
+    /* active calendar */
+    ui->dateTimeEdit_start->setCalendarPopup(true);
+    ui->dateTimeEdit_end->setCalendarPopup(true);
+
+    /* set current datetime */
+    ui->dateTimeEdit_start->setDateTime(QDateTime::currentDateTime());
+    ui->dateTimeEdit_end->setDateTime(QDateTime::currentDateTime());
 }
 
 ChartForm::~ChartForm()
@@ -92,13 +99,11 @@ void ChartForm::on_pushButton_display_clicked()
 void ChartForm::on_dateTimeEdit_start_dateTimeChanged(const QDateTime &dateTime)
 {
     m_startDt = dateTime;
-    //qDebug() << m_startDt;
 }
 
 void ChartForm::on_dateTimeEdit_end_dateTimeChanged(const QDateTime &dateTime)
 {
     m_endDt = dateTime;
-    //qDebug() << m_endDt;
 }
 
 void ChartForm::on_pushButton_rtDisplay_clicked()

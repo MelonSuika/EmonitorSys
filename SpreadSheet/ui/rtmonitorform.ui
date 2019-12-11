@@ -19,21 +19,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_left" stretch="5,1">
        <item>
-        <layout class="QGridLayout" name="girdLayoutMSheet">
-         <item row="0" column="0">
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
+        <layout class="QGridLayout" name="girdLayoutMSheet"/>
        </item>
        <item>
         <spacer name="verticalSpacer">
@@ -53,9 +39,16 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="pushButton_addDash">
          <property name="text">
-          <string>添加表盘</string>
+          <string>添加表盘(顺序)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_removeDash">
+         <property name="text">
+          <string>移除表盘(顺序)</string>
          </property>
         </widget>
        </item>

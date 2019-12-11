@@ -18,6 +18,7 @@ PageNavigator::PageNavigator(int blockSize/* = 3*/, QWidget *parent/* = nullptr*
 
     m_maxPage = 0;
     setMaxPage(1);
+    m_currentPage = 1;
     QString qss = QString(".QLabel[page=\"true\"] { padding: 6px; }")
         + QString(".QLabel[currentPage=\"true\"] { color: rgb(190, 0, 0);}")
         + QString(".QLabel[page=\"true\"]:hover { color: white; border-radius: 4px; background-color: qlineargradient(spread:reflect, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(53, 121, 238, 255), stop:1 rgba(0, 202, 237, 255));}");
@@ -101,7 +102,8 @@ void PageNavigator::setMaxPage(int page)
     if (m_maxPage != page)
 	{
         m_maxPage = page;
-        m_currentPage = 1;
+        /* 防止每次设置最大页，都跳回第一页 */
+        //m_currentPage = 1;
         updatePageLabels();
     }
 }

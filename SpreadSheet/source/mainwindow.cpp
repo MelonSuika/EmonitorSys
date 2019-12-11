@@ -90,6 +90,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_aboutFrom = nullptr;
     m_nCount = 0;
     m_nReadTimeGap = 5000;
+    m_nRcvCount = 0;
+    m_nSendCount = 0;
 
 
     m_test = 0;
@@ -484,15 +486,18 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
     DeviceInfo *pCurInfo = &serialPortInfo->m_pDeviceList->operator[](deviceSbInfo.nDeviceIndex);
 
     const QByteArray data = serial->readAll();
+    m_nRcvCount++;
+    ui->lineEdit_rcvAndSendCount->setText(QString("TX:%1 RX:%2").arg(m_nSendCount).arg(m_nRcvCount));
 
     if (data.size() == 0)
+
     {
         /* 读不到数据3次，继续下个设备 */
         if (pCurInfo->m_nReadErrorCount < 3)
         {
             pCurInfo->m_nReadErrorCount++;
             QTimer::singleShot(500, this, [=](){readDeviceData(deviceSbInfo);});
-            ui->textEditPrint->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")读取异常");
+            ui->textEditPrint->append(QString("%1(%2)读取异常").arg(serial->portName()).arg((uchar)pCurInfo->m_abyAddr[1]));
         }
         else
         {
@@ -505,12 +510,8 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
 
     analysisHM100PR(data, tOut, pOut, cOut);
 
-    ui->textEditPrint->append(serial->portName() + "(" + QString::number((uchar)pCurInfo->m_abyAddr[1]) + ")温度:" + QString::number((double)tOut/100)
-                              + "压力:" + QString::number(pOut)
-                              + "密度:" + QString::number(cOut));
-
-
-    ui->textEditConnectInfo->setText(serial->portName() + "时间:" + QDateTime::currentDateTime().toString());
+    ui->textEditPrint->append(QString("%1(%2)温度(℃):%3压力(MPa):%4密度(MPa):%5").arg(serial->portName()).arg((uchar)pCurInfo->m_abyAddr[1]).arg((float)tOut/100).arg((float)pOut/10000).arg((float)cOut/10000));
+    ui->lineEdit_time->setText(QString("%1时间:%2").arg(serial->portName()).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
     QJsonObject obj;
     obj.insert("温度", tOut);
     obj.insert("压力", pOut);
@@ -518,8 +519,9 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
     obj.insert("地址", (uchar)pCurInfo->m_abyAddr[1]);
 
     /* 插入数据库 */
-    if(!m_sqlQuery.exec("INSERT INTO TH015 VALUES('" + QDateTime::currentDateTime().toString("yyyy/M/d h:mm:s") +"', "+ QString::number(pOut) + ", " + QString::number(cOut) + ", " + QString::number(tOut) +  ")"))
+    if(!m_sqlQuery.exec(QString("INSERT INTO TH015 VALUES('%1', '%2', '%3', '%4')").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg((float)pOut/10000).arg((float)cOut/10000).arg((float)tOut/100)))
     {
+
         qDebug() << m_sqlQuery.lastError();
     }
     else
@@ -527,10 +529,7 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
         qDebug() << "inserted value 015,25,25!";
     }
     /* 温湿度数据插入数据库后，发送信号更新表盘 */
-    //if (deviceSbInfo.nDeviceIndex == 0)
-    {
-        emit sendRtData(&obj, deviceSbInfo);
-    }
+    emit sendRtData(&obj, deviceSbInfo);
 
     QTimer::singleShot(0, this, [=](){SendMsgFunc(deviceSbInfo.nDeviceIndex+1);});
 
@@ -595,10 +594,9 @@ void MainWindow::SendMsgFunc(int nIndex)
                 abyd[k] = d[k];
             }
             if (serial->isOpen())
-
             {
-                //qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7]<<QTime::currentTime()<<QString::number((uchar)deviceInfo.m_abyAddr[1]);
                 serial->write(abyd);
+                m_nSendCount++;
                 QTimer::singleShot(1000, this,[=](){this->readDeviceData(deviceSbInfo);} );
 
             }
@@ -756,7 +754,7 @@ void MainWindow::on_pushButton_setDeviceType_clicked()
 
 /*
     函数功能:添加子设备
-    note:串口连接对象可能是表也可能是集线器，集线器下会再连很多表，所以有时候
+    note:串口连接对象可能是具体设备也可能是集线器，集线器下会再连很多设备，所以有时候
     需要往端口上添加子设备
 */
 
@@ -875,12 +873,12 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
         {
             switch(pMsg->wParam)
             {
-            //设备连上
+            // USB设备连上
             case /*DBT_DEVICEARRIVAL*/0x8000:
                 mainWidgetPrint("有新端口接入", textEditDisplay);
                 upDateComComboBox();
                 break;
-            //设备断开
+            // USB设备断开
             case /*DBT_DEVICEREMOVECOMPLETE*/0x8004:
                 mainWidgetPrint("有端口断开", textEditDisplay);
                 upDateComComboBox();

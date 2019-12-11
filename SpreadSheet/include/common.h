@@ -1,9 +1,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#define COM_COUNT_MAX 128
 #include <QApplication>
 #include <QDebug>
+#include <algorithm>
 #include <QMessageBox>
 
 #include <QSqlError>
@@ -48,20 +48,29 @@ typedef struct deviceSymbolInfo
 enum DeviceType{
 
     TYPE_NONE = 0,
-    ZMJ100P = 1,
-    ZMJ60XD,
+    //ZMJ100P = 1,
+    //ZMJ60XD,
     ZMJ100PR,
-    HM100PR,
+    HM100PR = 4,
     ZMJ100PRO,
     ZMJ100PRW,
     ZMJ100PRDH,
     THC
 };
 
+#define COM_COUNT_MAX 128
+
 /* 轮询间隔 */
 #define POLL_GAP 500
 
-/* 皮肤 */
+/* 监测界面每页最大的设备数 */
+#define PAGE_MAXCOUNT 30
+/* 每页最大行数 */
+#define PAGE_MAXROW    6
+/* 每页最大列数 */
+#define PAGE_MAXCOLUMN 5
+
+/* 皮肤路径 */
 #define SKIN_BLUE ":/qss/widget-blue.qss"
 #define SKIN_DARK ":/qss/widget-black.qss"
 #define SKIN_ORANGE ":/qss/widget-darkOrange.qss"

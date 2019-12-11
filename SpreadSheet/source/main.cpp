@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    qDebug()<<argc<<argv[0];
     /* 建立并打开数据库 */
     QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setDatabaseName( "test.db" );
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
     {
         qDebug() << "Table created!";
     }
-    if (!sqlQuery.exec("create table TH015(time datetime primary key, pressure int, density int, temperature int)"))
+    if (!sqlQuery.exec("create table TH015(time datetime primary key, pressure float, density float, temperature float)"))
     {
         qDebug() << "Error: Fail to create table015."<< sqlQuery.lastError();
     }
@@ -61,6 +62,6 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     w.show();
-
+    //qDebug()<<a.instance()<<qApp;
     return a.exec();
 }

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "singledash.h"
+#include "pagenavigator.h"
 namespace Ui {
 class RtMonitorForm;
 }
@@ -18,12 +19,17 @@ public:
 private slots:
     void rcvRtData(QJsonObject *, DeviceSymbolInfo);
 
-    void on_pushButton_clicked();
+    void upDatePageWidget(int page);
+
+    void on_pushButton_removeDash_clicked();
+
+    void on_pushButton_addDash_clicked();
 
 private:
     Ui::RtMonitorForm *ui;
-    QList <SingleDash> *m_pListDash;
-    int m_nDashCount;
+    QList <SingleDashForm *> *m_pListDash;
+    int m_nTestDashCount;
+    PageNavigator *m_pPageNavigator;
 
 
 };

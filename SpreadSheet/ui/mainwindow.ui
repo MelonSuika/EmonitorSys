@@ -36,7 +36,7 @@
     <item>
      <layout class="QGridLayout" name="gridLayout">
       <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1,1">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
@@ -79,17 +79,33 @@
            <widget class="QTextEdit" name="textEditConnectInfo"/>
           </item>
           <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
+           <widget class="QGroupBox" name="groupBox_status">
+            <property name="styleSheet">
+             <string notr="true">border: none;</string>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>80</height>
-             </size>
+            <property name="title">
+             <string/>
             </property>
-           </spacer>
+            <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="2,1">
+             <item>
+              <widget class="QLineEdit" name="lineEdit_time">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_rcvAndSendCount">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
          </layout>
         </item>

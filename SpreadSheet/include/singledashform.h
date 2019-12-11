@@ -17,9 +17,11 @@ public:
 
     void setDashData(QJsonObject *data);
 
+    DeviceSymbolInfo m_deviceSbInfo;
 private:
     Ui::SingleDashForm *ui;
     QQuickWidget *m_quickWidget;
+
 
 };
 

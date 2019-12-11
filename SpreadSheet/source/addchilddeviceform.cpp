@@ -7,7 +7,9 @@ AddChildDeviceForm::AddChildDeviceForm(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->tableWidget->setRowCount(30); //设置行数为20
+    m_pComlist = nullptr;
+
+    ui->tableWidget->setRowCount(64); //设置行数为64
     ui->tableWidget->setColumnCount(5);
 
     /* 设置列名 */
@@ -29,6 +31,10 @@ AddChildDeviceForm::~AddChildDeviceForm()
 
 void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
 {
+    if (m_pComlist != nullptr)
+    {
+        return;
+    }
     int index = 0;
 
     m_pComlist = pComlist;
@@ -43,13 +49,11 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
     }
 
     ui->comboBox_type->addItem(TYPE_NONE + "未设置类型(0)");
-    ui->comboBox_type->addItem("ZMJ100P(4)");
-    ui->comboBox_type->addItem("ZMJ60XD(4)");
-    ui->comboBox_type->addItem("ZMJ100PR(4)");
-    ui->comboBox_type->addItem("HM100PR(4)超高压015");
-    ui->comboBox_type->addItem("ZMJ100PRO(4)");
-    ui->comboBox_type->addItem("ZMJ100PRW(4)");
-    ui->comboBox_type->addItem("ZMJ100PRDH(4)");
+    ui->comboBox_type->addItem("45R(4)001");
+    ui->comboBox_type->addItem("60R(4)048");
+    ui->comboBox_type->addItem("100R(4)高压015");
+    ui->comboBox_type->addItem("100R(4)普压009");
+    ui->comboBox_type->addItem("100RDH(5)微水");
     ui->comboBox_type->addItem("THC(8)温湿度控制器");
 
     for (int i = 0; i < pComlist->size(); i++)
@@ -130,7 +134,7 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
         {
             if (portInfo->m_nDeviceType != nDType)
             {
-                /* 协议类型 */
+                /* 设备类型 */
                 portInfo->m_nDeviceType = nDType;
                 for (int k = 0; ; k++)
                 {
@@ -139,6 +143,7 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
                         break;
 
                     }
+
                     ui->tableWidget->setItem(k, 3, new QTableWidgetItem(QString::number(portInfo->m_nDeviceType)));
                 }
             }
@@ -146,17 +151,4 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
         }
 
     }
-#if 0
-    for (int i = 0; i < m_pComlist->size(); i++)
-    {
-        qDebug()<<"size = "<<m_pComlist->operator[](i).m_pDeviceList->size();
-        for (int j = 0; j < m_pComlist->operator[](i).m_pDeviceList->size(); j++)
-        {
-            qDebug()<<"addr:"<<m_pComlist->operator[](i).m_pDeviceList->operator[](j).m_abyAddr.toHex();
-
-        }
-
-    }
-#endif
-
 }
