@@ -80,6 +80,12 @@ HEADERS += \
     ./include/pagenavigator.h \
     ./include/loadqss.h \
     ./include/aboutform.h \
+    glog/config.h \
+    glog/logging.h \
+    glog/raw_logging.h \
+    glog/stl_logging.h \
+    glog/vlog_is_on.h \
+    glog/log_severity.h \
         spreadsheet/include/printview.h \
         spreadsheet/include/spreadsheet.h \
         spreadsheet/include/spreadsheetdelegate.h \
@@ -134,6 +140,7 @@ DISTFILES += \
     dialcontrol/dialcontrol.qml \
     dialcontrol/doc/images/qml-dialcontrol-example.png \
     dialcontrol/doc/src/dialcontrol.qdoc \
+    image/down_arrow.png \
     image/gage.png \
     image/lanso.png \
     qss/widget-black.qss \
@@ -146,3 +153,8 @@ RESOURCES += \
     ./qrc/icon.qrc
 
 RC_ICONS += :/../image/bitbug_favicon_128.ico
+
+win32: LIBS += -L$$PWD/lib/ -llibglog.dll
+
+INCLUDEPATH += $$PWD/include
+DEPENDPATH += $$PWD/include

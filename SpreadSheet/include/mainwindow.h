@@ -25,7 +25,7 @@ class MainWindow;
 
 enum OutPutWidget{
     textEditPrint = 0,
-    textEditDisplay,
+    textEditDebug,
     textEditConnectInfo
 };
 
@@ -101,10 +101,8 @@ private:
     SpreadSheet *m_pSpreadSheet;
     Console *m_console = nullptr;
     /* 串口数组 */
-    QTimer *m_timer;            /* 定时读取 */
     QTimer *m_delayTimer;       /* 延时读取timer */
-    QTimer *m_gasTimer;         /* gas timer */
-    //QTimer *m_delayReadTimer;   /* 延时读取 */
+
     bool isRunFlag;
     QByteArray m_abyBuffer;     /* 接收数据备份缓存 */
     int m_nWaitSerialCnt;       /* 缓存区数据不够计数 */

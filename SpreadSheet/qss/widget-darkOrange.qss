@@ -156,7 +156,7 @@ QComboBox::drop-down
 
 QComboBox::down-arrow
 {
-     image: url(:/down_arrow.png);
+     image: url(qrc:/../image/down_arrow.png);
 }
 
 QGroupBox:focus

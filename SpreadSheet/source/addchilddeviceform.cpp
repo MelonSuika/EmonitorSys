@@ -21,12 +21,17 @@ AddChildDeviceForm::AddChildDeviceForm(QWidget *parent) :
 
     ui->horizontalLayout->setStretch(0, 6);
     ui->horizontalLayout->setStretch(1, 3);
+
+    //this->setAttribute(Qt::WA_DeleteOnClose);
+    //ui->comboBox_com->showPopup();
+    //ui->comboBox_type->showPopup();
 }
 
 AddChildDeviceForm::~AddChildDeviceForm()
 {
     delete ui;
 }
+
 
 
 void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
@@ -67,7 +72,6 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
             ui->tableWidget->setItem(index, 3, new QTableWidgetItem(QString::number(portInfo.m_pDeviceList->operator[](j).m_nDeviceType)));
             index++;
         }
-
     }
 }
 
@@ -77,6 +81,11 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
 */
 void AddChildDeviceForm::on_pushButton_ok_clicked()
 {
+    if (m_pComlist->size() == 0)
+    {
+        QMessageBox::warning(NULL, QStringLiteral("警告"), QStringLiteral("当前无连接端口"), QMessageBox::Ok);
+        return ;
+    }
     for (int i = 0; i < m_pComlist->size(); i++)
     {
         SerialPortInfo *portInfo = &m_pComlist->operator[](i);
@@ -152,3 +161,5 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
 
     }
 }
+
+

@@ -6,7 +6,6 @@
 #include <QtConcurrent>
 #include <windows.h>
 #include <QTimer>
-#include <QSerialPortInfo>
 #include <QtQuickWidgets/QQuickWidget>
 #include "chartform.h"
 #include "datasheetform.h"
@@ -32,10 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton_setDeviceType->hide();
 
     isRunFlag           = false;
-    m_timer             = new QTimer(this);
     m_delayTimer        = new QTimer(this);
-    //m_delayReadTimer    = new QTimer(this);
-    //m_gasTimer          = new QTimer(this);
     m_nComCount = 0;
 
     /* 加载qss改变界面风格 */
@@ -44,13 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
     /* textEditConnectInfo防止信息太多崩溃 */
     ui->textEditConnectInfo->document()->setMaximumBlockCount(100);
 
-
     /* COM监测相关初始化 */
     foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
     {
-        qDebug()<<"Name:"<<info.portName();
-        qDebug()<<"Description:"<<info.description();
-        qDebug()<<"Manufacturer:"<<info.manufacturer();
+        LOG(INFO) << "Name:" << info.portName().toStdString() << endl
+                  << "Description:"<<info.description().toStdString() <<endl
+                  << "Manufacturer:"<<info.manufacturer().toStdString();
 
         SerialPortInfo serialPortInfo;
 
@@ -69,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (m_nComCount == 0)
     {
         ui->comboBoxIsActiveCom->addItem("无端口连接");
+        LOG(INFO) << "无端口连接";
     }
 
     /* 定时间隔设置下拉初始化 */
@@ -101,7 +97,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete m_timer;
 }
 
 /*
@@ -160,8 +155,6 @@ void MainWindow::on_pushButtonSerial_clicked()
             serial->close();
             ui->textEditPrint->append("close serial " + serial->portName() + " success");
             ui->pushButtonSerial->setText("打开串口");
-            /* 停止定时器 */
-            m_timer->stop();
         }
         nCntCom++;
 
@@ -460,7 +453,6 @@ void MainWindow::readData()
 void readData2(QSerialPort *serial)
 {
     int size = 0;
-    //while(size < 11)
     {
 
         const QByteArray data = serial->read(25);
@@ -490,7 +482,6 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
     ui->lineEdit_rcvAndSendCount->setText(QString("TX:%1 RX:%2").arg(m_nSendCount).arg(m_nRcvCount));
 
     if (data.size() == 0)
-
     {
         /* 读不到数据3次，继续下个设备 */
         if (pCurInfo->m_nReadErrorCount < 3)
@@ -545,6 +536,13 @@ void MainWindow::SendMsgFunc(int nIndex)
 
     for (int i = 0; i < m_pComlist->size(); i++)
     {
+
+        if (isRunFlag == false)
+        {
+            mainWidgetPrint("already quit SendMsgFunc", textEditDebug);
+            return ;
+        }
+
         DeviceSymbolInfo deviceSbInfo;
         deviceSbInfo.nComIndex = i;
         deviceSbInfo.nDeviceIndex = nIndex;
@@ -557,6 +555,7 @@ void MainWindow::SendMsgFunc(int nIndex)
         abyd.resize(8);
         if (!serial->isOpen())
         {
+            mainWidgetPrint(QString("串口(%1)已关闭").arg(serial->portName()), textEditPrint);
             continue;
         }
 
@@ -602,57 +601,6 @@ void MainWindow::SendMsgFunc(int nIndex)
             }
         }
 
-#if 0
-        for (int j = 0; j < portInfo.m_pDeviceList->size(); j++)
-        {
-            DeviceInfo deviceInfo = portInfo.m_pDeviceList->operator[](j);
-            switch(/*portInfo.m_nDeviceType*/ deviceInfo.m_nDeviceType)
-            {
-                case THC:
-                {
-                    uchar td[8] = TH_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 2);
-                    memcpy(d, td, 6);
-                    break;
-                }
-                case HM100PR:
-                {
-                    uchar td[8] = HM_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 3);
-                    memcpy(d, td, 6);
-                    break;
-                }
-
-            }
-            wCrc = Get_CRC(d, 6);
-            d[7] = (wCrc&0xff00)>>8;
-            d[6] = (wCrc&0x00ff);
-            for (int k = 0; k < 8; k++)
-            {
-                abyd[k] = d[k];
-            }
-            if (serial->isOpen())
-            {
-                qDebug()<<d[0]<<d[1]<<d[2]<<d[3]<<d[4]<<d[5]<<d[6]<<d[7]<<QTime::currentTime()<<QString::number((uchar)deviceInfo.m_abyAddr[1]);
-                serial->write(abyd);
-
-            }
-
-
-            /* 枷锁，等收到或者超时后发送下一帧 */
-            /* 监测相邻两次的发送间隔 */
-
-            /*
-            QTime t;
-            int i = 0;
-            t.start();
-            while(t.elapsed() < POLL_GAP)
-            {
-                QCoreApplication::processEvents();
-
-            }
-            */
-
-        }
-#endif
     }
     return ;
 }
@@ -672,7 +620,7 @@ void MainWindow::on_pushButtonReadData_clicked()
     else
     {
         isRunFlag = true;
-        QTimer::singleShot(1000, this, SLOT(SendMsgFunc()));
+        QTimer::singleShot(0, this, SLOT(SendMsgFunc()));
         mainWidgetPrint("定时读取开启", textEditPrint);
         ui->pushButtonReadData->setText("定时读取关闭");
     }
@@ -875,12 +823,12 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, long *r
             {
             // USB设备连上
             case /*DBT_DEVICEARRIVAL*/0x8000:
-                mainWidgetPrint("有新端口接入", textEditDisplay);
+                mainWidgetPrint("有新端口接入", textEditDebug);
                 upDateComComboBox();
                 break;
             // USB设备断开
             case /*DBT_DEVICEREMOVECOMPLETE*/0x8004:
-                mainWidgetPrint("有端口断开", textEditDisplay);
+                mainWidgetPrint("有端口断开", textEditDebug);
                 upDateComComboBox();
                 break;
             //其他的消息可以查看“Dbt.h”文件
@@ -903,7 +851,7 @@ void MainWindow::mainWidgetPrint(QString info, int outPutWidget)
         case textEditPrint:
             ui->textEditPrint->append(info);
             break;
-        case textEditDisplay:
+        case textEditDebug:
             ui->textEditRcvDisplay->append(info);
             break;
         case textEditConnectInfo:

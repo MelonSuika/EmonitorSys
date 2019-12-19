@@ -1,9 +1,10 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <algorithm>
+
 #include <QApplication>
 #include <QDebug>
-#include <algorithm>
 #include <QMessageBox>
 
 #include <QSqlError>
@@ -26,6 +27,12 @@
 
 #include <QJsonObject>
 #include <QQuickWidget>
+#include <QTime>
+
+/* windows下宏冲突，添加该宏防止编译报错 */
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#include "glog/config.h"
+#include "glog/logging.h"
 
 
 /* 温湿度传感器 */
@@ -76,5 +83,9 @@ enum DeviceType{
 #define SKIN_ORANGE ":/qss/widget-darkOrange.qss"
 
 int comtextToType(QString str);
+
+/* log文件 */
+#define LOGFILE "run.log"
+
 
 #endif // COMMON_H

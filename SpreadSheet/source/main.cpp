@@ -3,65 +3,54 @@
 #include "connection.h"
 #include <QProcess>
 #include <QStyleFactory>
-#include <QDebug>
 #include <QSqlError>
 #include <QSqlQuery>
-#include <QTime>
 
-
+using namespace GOOGLE_NAMESPACE;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    qDebug()<<argc<<argv[0];
+    /* 打开日志 */
+    InitGoogleLogging(argv[0]);
+    FLAGS_log_dir = "./";
+    LOG(INFO)<<"Programe Run";
+
     /* 建立并打开数据库 */
     QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE" );
     db.setDatabaseName( "test.db" );
 
     if (!db.open())
     {
-        qDebug() << "Error: Failed to connect database." << db.lastError();
+        LOG(ERROR)<<"Error: Failed to connect database." << db.lastError().text().toStdString();
         return -1;
     }
     else
     {
-        qDebug() << "Succeed to connect database.";
+        LOG(INFO) << "Succeed to connect database.";
     }
 
     /* 创建表格 */
     QSqlQuery sqlQuery;
     if(!sqlQuery.exec("create table TH3(time datetime primary key, temperature int, humidity int)"))
     {
-        qDebug() << "Error: Fail to create table."<< sqlQuery.lastError();
+        LOG(WARNING) << "Error: Fail to create table." << sqlQuery.lastError().text().toStdString();
     }
     else
     {
-        qDebug() << "Table created!";
+        LOG(INFO) << "TH3 Table Created!";
     }
     if (!sqlQuery.exec("create table TH015(time datetime primary key, pressure float, density float, temperature float)"))
     {
-        qDebug() << "Error: Fail to create table015."<< sqlQuery.lastError();
+        LOG(WARNING) << "Error: Fail to create table015." << sqlQuery.lastError().text().toStdString();
     }
     else
     {
-        qDebug() << "Table015 created!";
+        LOG(INFO) << "TH15 Table Created!";
     }
-
-    /* 插入数据 */
-    /*QTime::currentTime().toString()*/
-    /*if(!sqlQuery.exec("INSERT INTO THC VALUES('8:55:41', 25, 25)"))
-    {
-        qDebug() << sqlQuery.lastError();
-    }
-    else
-    {
-        qDebug() << "inserted value 1,25,25!";
-    }*/
-
 
     MainWindow w;
 
     w.show();
-    //qDebug()<<a.instance()<<qApp;
     return a.exec();
 }
