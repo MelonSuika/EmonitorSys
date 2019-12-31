@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
     FLAGS_log_dir = "./";
     LOG(INFO)<<"Programe Run";
 
-    /* 建立并打开数据库 */
-    QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE" );
+    /* 添加一个连接名为cnct1的SQLITE数据库连接 */
+    QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE");
     db.setDatabaseName( "test.db" );
 
     if (!db.open())

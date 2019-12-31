@@ -529,6 +529,7 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
 
 /*
     函数功能:定时给串口发送读数据消息
+    (后期更改为子线程调用)
 */
 
 void MainWindow::SendMsgFunc(int nIndex)

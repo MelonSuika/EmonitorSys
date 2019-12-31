@@ -12,49 +12,81 @@ ChartForm::ChartForm(QWidget *parent) :
 
     /* point list */
     m_vectorPoint = new QVector<QPointF>;
+    m_dataDensity_Time = new QVector<QCPGraphData>;
+    m_dataPressure_Time = new QVector<QCPGraphData>;
+    m_dataTemperature_Time = new QVector<QCPGraphData>;
 
-    m_series = new QSplineSeries();
-    m_series->setPen(QPen(Qt::blue,1,Qt::SolidLine)); //设置画笔
 
-    *m_series << QPointF(1, 5) << QPointF(3, 7) << QPointF(7, 6) << QPointF(9, 7) << QPointF(12, 6)
-            << QPointF(16, 7) << QPointF(18, 5);
+    // configure bottom axis to show date instead of number:
+    QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
+    dateTicker->setDateTimeFormat("MM-dd hh:mm:ss");
+    ui->customPlot->xAxis->setTicker(dateTicker);
+    ui->customPlot->xAxis->setTickLabelRotation(65);
 
-    m_chart = new QChart();
-    m_chart->addSeries(m_series);
-    m_chart->createDefaultAxes();   //设置默认的坐标系，如果不设置程序是运行不了的
-    m_chart->setTitle("曲线图");
-    //m_chart->setTheme(QChart::ChartTheme::ChartThemeDark);
+    ui->customPlot->yAxis->setLabel("密度(MPa)");
+    //ui->customPlot->yAxis->settick
+    ui->customPlot->yAxis2->setVisible(true);
+    ui->customPlot->yAxis2->setLabel("温度(℃)");
 
-    /* 画坐标轴X */
-    QValueAxis *axisX = new QValueAxis;
-    axisX->setRange(0, 23);    //设置范围
-    axisX->setLabelFormat("%u");   //设置刻度的格式
-    axisX->setGridLineVisible(true);   //网格线可见
-    axisX->setTickCount(7);       //设置多少格
-    axisX->setMinorTickCount(3);   //设置每格小刻度线的数目
-    m_chart->setAxisX(axisX, m_series);
+    /* 添加时间-密度曲线 */
+    ui->customPlot->addGraph();
+    ui->customPlot->graph()->data()->set(*m_dataDensity_Time);
+    ui->customPlot->graph()->setKeyAxis(ui->customPlot->xAxis);
+    ui->customPlot->graph()->setValueAxis(ui->customPlot->yAxis);
+    ui->customPlot->graph()->setPen(QColor(0, 255, 0));
+    ui->customPlot->graph()->setName("密度");
+    ui->customPlot->graph()->setBrush(QBrush(QColor(0, 255, 0, 45)));
+    ui->customPlot->graph()->setScatterStyle(QCPScatterStyle::ScatterShape::ssSquare);
+    ui->customPlot->graph()->setLineStyle(QCPGraph::LineStyle::lsNone);
 
-    /* 画坐标轴Y */
-    QValueAxis *axisY = new QValueAxis;
-    axisY->setRange(0, 50);
-    axisY->setLabelFormat("%u");
-    axisY->setGridLineVisible(true);
-    axisY->setTickCount(10);
-    axisY->setMinorTickCount(1);
+    /* 添加时间-温度曲线 */
+    ui->customPlot->addGraph();
+    ui->customPlot->graph()->data()->set(*m_dataTemperature_Time);
+    ui->customPlot->graph()->setKeyAxis(ui->customPlot->xAxis);
+    ui->customPlot->graph()->setValueAxis(ui->customPlot->yAxis2);
+    ui->customPlot->graph()->setPen(QColor(255, 0, 0));
+    ui->customPlot->graph()->setName("温度");
+    ui->customPlot->graph()->setBrush(QBrush(QColor(255, 0, 0, 45)));
+    ui->customPlot->graph()->setScatterStyle(QCPScatterStyle::ScatterShape::ssDisc);
+    ui->customPlot->graph()->setLineStyle(QCPGraph::LineStyle::lsNone);
 
-    m_chartView = new QChartView(m_chart);
-    m_chartView->setRenderHint(QPainter::Antialiasing);
+    /* 添加时间-压力曲线 */
+    ui->customPlot->addGraph();
+    ui->customPlot->graph()->data()->set(*m_dataPressure_Time);
+    ui->customPlot->graph()->setKeyAxis(ui->customPlot->xAxis);
+    ui->customPlot->graph()->setValueAxis(ui->customPlot->yAxis);
+    ui->customPlot->graph()->setPen(QColor(0, 0, 255));
+    ui->customPlot->graph()->setName("压力");
+    ui->customPlot->graph()->setBrush(QBrush(QColor(0, 0, 255, 45)));
+    ui->customPlot->graph()->setScatterStyle(QCPScatterStyle::ScatterShape::ssPlusCircle);
+    ui->customPlot->graph()->setLineStyle(QCPGraph::LineStyle::lsNone);
 
-    m_chartView->resize(800, 600);
-    m_chartView->setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-    ui->horizontalLayoutChart->addWidget(m_chartView);
+    /* 设置坐标范围 */
+    ui->customPlot->xAxis->setRange(QDateTime::currentDateTime().toTime_t(), QDateTime::currentDateTime().toTime_t() + 100);
+    ui->customPlot->yAxis->setRange(-0.2, 0.9);
+    ui->customPlot->yAxis2->setRange(-40, 70);
 
-    /* select info */
-    ui->gridLayout_chart->setColumnStretch(0, 5);
-    ui->gridLayout_chart->setColumnStretch(1, 2);
 
-    m_nEnd = 19;
-    m_chart->axisY()->setMin(0);
+    /* 添加小标 */
+    //QSharedPointer<QCPAxisTickerText> textTicker(new QCPAxisTickerText);
+    //textTicker->addTick(0.1, "a bit\nlow");
+    //textTicker->addTick(0.5, "quite\nhigh");
+    //ui->customPlot->yAxis->setTicker(textTicker);
+
+    /* 显示图例 */
+    ui->customPlot->legend->setVisible(true);
+    // make bottom axes always transfer their ranges top axes:
+    //connect(ui->customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->customPlot->xAxis2, SLOT(setRange(QCPRange)));
+    //ui->customPlot->graph(0)->rescaleAxes(false);
+    //ui->customPlot->graph(1)->rescaleAxes(false);
+
+    /* 可拉伸、缩放、选中 */
+    ui->customPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
+
+    /* 仅水平方向可缩放改变 */
+    ui->customPlot->axisRect()->setRangeZoom(Qt::Horizontal);
+    /* 仅水平方向可拖拽 */
+    ui->customPlot->axisRect()->setRangeDrag(Qt::Horizontal);
 
     /* active calendar */
     ui->dateTimeEdit_start->setCalendarPopup(true);
@@ -63,6 +95,18 @@ ChartForm::ChartForm(QWidget *parent) :
     /* set current datetime */
     ui->dateTimeEdit_start->setDateTime(QDateTime::currentDateTime());
     ui->dateTimeEdit_end->setDateTime(QDateTime::currentDateTime());
+
+    m_sqlProcess = new QThread;
+    m_sqlProcess->start();
+    m_sqlChartFormObj = new SQLChartFormObject;
+    m_sqlChartFormObj->moveToThread(m_sqlProcess);
+
+
+    connect(this, SIGNAL(onLoad(QDateTime, QDateTime)), m_sqlChartFormObj, SLOT(readData(QDateTime, QDateTime)));
+    connect(m_sqlChartFormObj, SIGNAL(loadOver(QVector<double>*,QVector<double>*,QVector<double>*,QVector<double>*)),
+            this, SLOT(disPlay(QVector<double>*, QVector<double>*,QVector<double>*,QVector<double>*)));
+    connect(ui->customPlot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(custPlotMoveEvent(QMouseEvent*)));
+
 }
 
 ChartForm::~ChartForm()
@@ -73,25 +117,11 @@ ChartForm::~ChartForm()
 void ChartForm::on_pushButton_display_clicked()
 {
 
-    m_query = new QSqlQuery;
-
-    qDebug()<<"SELECT time, temperature, humidity FROM TH3\
-              WHERE time > '" + ui->dateTimeEdit_start->text() + "' and time < '" + ui->dateTimeEdit_end->text() + "';";
-    m_query->exec("SELECT time, temperature, humidity FROM TH3\
-                  WHERE time > '" + ui->dateTimeEdit_start->text() + "' and time < '" + ui->dateTimeEdit_end->text() + "';");
-    while(m_query->next())
-    {
-        QString str = m_query->value(1).toString();
-        qDebug()<<str;
-        if (m_series->count()>100)
-        {
-            m_series->removePoints(0, 1);
-        }
-        m_series->append(m_nEnd, m_query->value(1).toInt()/100);
-        m_chart->axisX()->setMin(0);
-        m_chart->axisX()->setMax(100);
-    }
-
+    emit onLoad(m_startDt, m_endDt);
+    //ui->customPlot->xAxis->setRange(m_startDt, m_endDt);
+    ui->customPlot->xAxis->setRange(QDateTime::fromString(ui->dateTimeEdit_start->text(), "yyyy-MM-dd hh:mm").toSecsSinceEpoch(),
+                                        QDateTime::fromString(ui->dateTimeEdit_end->text(), "yyyy-MM-dd hh:mm").toSecsSinceEpoch());
+    qDebug()<<"emit onLoad";
 
 }
 
@@ -99,17 +129,96 @@ void ChartForm::on_pushButton_display_clicked()
 void ChartForm::on_dateTimeEdit_start_dateTimeChanged(const QDateTime &dateTime)
 {
     m_startDt = dateTime;
+    //qDebug()<<m_startDt;
 }
 
 void ChartForm::on_dateTimeEdit_end_dateTimeChanged(const QDateTime &dateTime)
 {
     m_endDt = dateTime;
+    //qDebug()<<m_endDt;
 }
 
 void ChartForm::on_pushButton_rtDisplay_clicked()
 {
-    m_series->removePoints(0, 1);
-    m_series->append(m_nEnd++, qrand()%8);
-    m_chart->axisX()->setMin(m_nEnd-18);
-    m_chart->axisX()->setMax(m_nEnd);
+
+
+}
+
+void ChartForm::on_pushButton_testAddData_clicked()
+{
+    double low = ui->customPlot->xAxis->range().lower;
+    double up = ui->customPlot->xAxis->range().upper;
+    qDebug()<<low << up << up - low;
+    for (int i = low; i <= up; i++)
+    {
+        QCPGraphData gphData;
+        gphData.key = i;
+        gphData.value = 0.9/(i%25);
+        ui->customPlot->graph(0)->addData(gphData.key, gphData.value);
+        ui->customPlot->replot();
+    }
+}
+
+void ChartForm::disPlay(QVector<double>*d,QVector<double>*p,QVector<double>*t,QVector<double>*dd)
+{
+    ui->customPlot->graph(0)->setData(*dd, *d);
+    ui->customPlot->graph(1)->setData(*dd, *t);
+    ui->customPlot->graph(2)->setData(*dd, *p);
+    ui->customPlot->replot();
+
+}
+
+
+void ChartForm::custPlotMoveEvent(QMouseEvent *e)
+{
+    /* 获取光标位置 */
+    int x_pos = e->pos().x();
+    int y_pos = e->pos().y();
+
+    /* 转化为坐标系位置 */
+    double x_coord = ui->customPlot->xAxis->pixelToCoord(x_pos);
+    double y_coord = ui->customPlot->yAxis->pixelToCoord(y_pos);
+
+    QString str = QString("时间:%1").arg(QDateTime::fromTime_t(x_coord).toString());
+
+    for (int i = 0; i < ui->customPlot->xAxis->graphs().count(); i++)
+    {
+        double y = 0;
+        int start = 0, end = ui->customPlot->graph(i)->data()->size(), cur = start;
+        /* 二分查找 */
+        do{
+            if (x_coord <= ui->customPlot->graph(i)->data()->at((start + end)/2)->key)
+            {
+                end = (start + end) / 2;
+            }
+            else
+            {
+                start = (start + end) / 2;
+            }
+            y = ui->customPlot->graph(i)->data()->at(end)->value;
+
+        }while(end - start > 1);
+
+        /* 显示文本 */
+        switch (i)
+        {
+            case 0:
+                str += QString("\n密度:");
+                break;
+            case 1:
+                str += QString("\n温度:");
+                break;
+            case 2:
+                str += QString("\n压力:");
+                break;
+            default:
+                break;
+
+        }
+        str += QString::asprintf("%.3f", y);
+
+    }
+    QToolTip::showText(cursor().pos(), str, ui->customPlot);
+
+
 }

@@ -48,7 +48,7 @@ DataSheetForm::~DataSheetForm()
 void DataSheetForm::on_pushButton_query_clicked()
 {
     qDebug()<<ui->dateTimeEdit_start;
-    m_model->setQuery(QString("SELECT * FROM TH015 WHERE time > '%1' and time < '%2' limit '%3'").arg(ui->dateTimeEdit_start->text()).arg(ui->dateTimeEdit_end->text()).arg(5000));
+    m_model->setQuery(QString("SELECT * FROM TH015 WHERE time > '%1' and time < '%2' limit '%3'").arg(ui->dateTimeEdit_start->text()).arg(ui->dateTimeEdit_end->text()).arg(10000));
 
 }
 

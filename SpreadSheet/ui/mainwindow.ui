@@ -270,7 +270,7 @@
                  <item>
                   <widget class="QPushButton" name="pushButtonSheet">
                    <property name="text">
-                    <string>查看历史数据</string>
+                    <string>历史统计图</string>
                    </property>
                   </widget>
                  </item>

@@ -25,9 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 INCLUDEPATH += \
-        ./spreadsheet/include   \
-        ./terminal  \
         ./include   \
+INCLUDEPATH += $$PWD/spreadsheet
+INCLUDEPATH += $$PWD/glog
+INCLUDEPATH += $$PWD/qcustomplot
+
+include     ($$PWD/qcustomplot/qcustomplot.pri)
+include     ($$PWD/glog/glog.pri)
 
 SOURCES += \
     ./source/chartform.cpp \
@@ -51,11 +55,7 @@ SOURCES += \
     ./source/singledash.cpp \
     ./source/pagenavigator.cpp \
     ./source/aboutform.cpp \
-        spreadsheet/source/printview.cpp \
-        spreadsheet/source/spreadsheet.cpp \
-        spreadsheet/source/spreadsheetdelegate.cpp \
-        spreadsheet/source/spreadsheetitem.cpp  \
-        #terminal/console.cpp
+    ./source/sqlchartformObject.cpp \
 
 HEADERS += \
     ./include/chartform.h \
@@ -80,16 +80,7 @@ HEADERS += \
     ./include/pagenavigator.h \
     ./include/loadqss.h \
     ./include/aboutform.h \
-    glog/config.h \
-    glog/logging.h \
-    glog/raw_logging.h \
-    glog/stl_logging.h \
-    glog/vlog_is_on.h \
-    glog/log_severity.h \
-        spreadsheet/include/printview.h \
-        spreadsheet/include/spreadsheet.h \
-        spreadsheet/include/spreadsheetdelegate.h \
-        spreadsheet/include/spreadsheetitem.h   \
+    ./include/sqlchartformObject.h \
 
 UI_DIR=./ui
 FORMS += \

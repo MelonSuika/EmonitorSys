@@ -5,6 +5,8 @@
 #include "common.h"
 #include <QDateTime>
 #include "rtchartform.h"
+#include "qcustomplot.h"
+#include "sqlchartformobject.h"
 
 namespace Ui {
 class ChartForm;
@@ -28,6 +30,13 @@ private slots:
 
     void on_pushButton_rtDisplay_clicked();
 
+    void on_pushButton_testAddData_clicked();
+
+    void disPlay(QVector<double>*,QVector<double>*,QVector<double>*,QVector<double>*);
+
+    void custPlotMoveEvent(QMouseEvent*);
+signals:
+    void onLoad(QDateTime, QDateTime);
 private:
     Ui::ChartForm *ui;
 
@@ -38,10 +47,20 @@ private:
     QChartView *m_chartView;
     QSplineSeries *m_series;
     QVector<QPointF> *m_vectorPoint;
+    QVector<QDateTime> *m_vctDateTime;
+    QVector<double> *m_vctDDate;
+    QVector<double> *m_vctTemperature;
+    QVector<double> *m_vctDensity;
+    QVector<double> *m_vctPressure;
+    QVector<QCPGraphData> *m_dataDensity_Time;
+    QVector<QCPGraphData> *m_dataTemperature_Time;
+    QVector<QCPGraphData> *m_dataPressure_Time;
     int m_nEnd;
 
-    QSqlQueryModel *m_model;
-    QSqlQuery *m_query;
+    SQLChartFormObject *m_sqlChartFormObj;
+
+    /* 数据处理线程 */
+    QPointer<QThread> m_sqlProcess;
 };
 
 #endif // CHARTFORM_H

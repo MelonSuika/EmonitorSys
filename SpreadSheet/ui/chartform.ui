@@ -21,7 +21,7 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QGridLayout" name="gridLayout_chart">
+    <layout class="QGridLayout" name="gridLayout_chart" columnstretch="4,1">
      <property name="sizeConstraint">
       <enum>QLayout::SetMaximumSize</enum>
      </property>
@@ -34,7 +34,11 @@
         <enum>QLayout::SetMaximumSize</enum>
        </property>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayoutChart"/>
+        <layout class="QHBoxLayout" name="horizontalLayoutChart">
+         <item>
+          <widget class="QCustomPlot" name="customPlot" native="true"/>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -53,6 +57,13 @@
          </property>
          <property name="text">
           <string>显示实时图表</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_testAddData">
+         <property name="text">
+          <string>测试添加</string>
          </property>
         </widget>
        </item>
@@ -84,91 +95,91 @@
           </size>
          </property>
          <property name="title">
-          <string>选择信息</string>
+          <string>筛选信息</string>
          </property>
-         <widget class="QWidget" name="gridLayoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>10</x>
-            <y>20</y>
-            <width>267</width>
-            <height>161</height>
-           </rect>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_selectInfo" rowstretch="2,0,0,0,0,0" columnstretch="3,0,0">
-           <item row="3" column="1">
-            <widget class="QDateTimeEdit" name="dateTimeEdit_start">
-             <property name="displayFormat">
-              <string>yyyy-MM-dd HH:mm</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QDateTimeEdit" name="dateTimeEdit_end">
-             <property name="displayFormat">
-              <string>yyyy-MM-dd HH:mm</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>起始时间:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>结束时间:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>日期</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit_select"/>
-           </item>
-           <item row="5" column="1">
-            <widget class="QPushButton" name="pushButton_display">
-             <property name="text">
-              <string>生成曲线图</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>2</width>
+              <height>17</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDateTimeEdit" name="dateTimeEdit_start">
+            <property name="displayFormat">
+             <string>yyyy-MM-dd HH:mm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_start">
+            <property name="text">
+             <string>起始时间:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>2</width>
+              <height>17</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_end">
+            <property name="text">
+             <string>结束时间:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDateTimeEdit" name="dateTimeEdit_end">
+            <property name="displayFormat">
+             <string>yyyy-MM-dd HH:mm</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QPushButton" name="pushButton_display">
+            <property name="text">
+             <string>生成曲线图</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_select"/>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_date">
+            <property name="text">
+             <string>日期</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEdit_address"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_address">
+            <property name="text">
+             <string>地址</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -177,6 +188,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header location="global">qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

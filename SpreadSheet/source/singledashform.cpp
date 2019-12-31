@@ -9,6 +9,12 @@ SingleDashForm::SingleDashForm(QWidget *parent) :
     ui->setupUi(this);
 
     /* 加载表盘 */
+    /*
+    ui->quickDashWidget->setSource(QUrl("qrc:/dialcontrol.qml"));
+    ui->quickDashWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    ui->quickDashWidget->show();
+    */
+
     //m_quickWidget = new QQuickWidget;
     //m_quickWidget->setSource(QUrl(""));
     //ui->verticalLayout_display->addWidget(m_quickWidget);

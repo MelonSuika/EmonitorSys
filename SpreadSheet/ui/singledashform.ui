@@ -19,7 +19,11 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_display">
        <item>
-        <widget class="QLCDNumber" name="lcdNumber"/>
+        <widget class="QQuickWidget" name="quickDashWidget">
+         <property name="resizeMode">
+          <enum>QQuickWidget::SizeRootObjectToView</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -71,6 +75,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QQuickWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QtQuickWidgets/QQuickWidget</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
