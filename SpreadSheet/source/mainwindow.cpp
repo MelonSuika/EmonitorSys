@@ -1,4 +1,4 @@
- #include "mainwindow.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "QLayout"
 #include "spreadsheet.h"
@@ -41,31 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textEditConnectInfo->document()->setMaximumBlockCount(100);
 
     /* COM监测相关初始化 */
-    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
-    {
-        LOG(INFO) << "Name:" << info.portName().toStdString() << endl
-                  << "Description:"<<info.description().toStdString() <<endl
-                  << "Manufacturer:"<<info.manufacturer().toStdString();
-
-        SerialPortInfo serialPortInfo;
-
-        //这里相当于自动识别串口号之后添加到了cmb，如果要手动选择可以用下面列表的方式添加进去
-        serialPortInfo.m_serial->setPort(info);
-        if(serialPortInfo.m_serial->open(QIODevice::ReadWrite))
-        {
-            m_pComlist->append(serialPortInfo);
-            //将串口号添加到cmb
-            ui->comboBoxIsActiveCom->addItem(info.portName());
-            //关闭串口等待人为(打开串口按钮)打开
-            serialPortInfo.m_serial->close();
-            m_nComCount++;
-        }
-    }
-    if (m_nComCount == 0)
-    {
-        ui->comboBoxIsActiveCom->addItem("无端口连接");
-        LOG(INFO) << "无端口连接";
-    }
+    updateComList();
 
     /* 定时间隔设置下拉初始化 */
 
@@ -85,7 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_gasQuickForm = nullptr;
     m_aboutFrom = nullptr;
     m_nCount = 0;
-    m_nReadTimeGap = 5000;
+    m_nReadTimeGap = 1000;
     m_nRcvCount = 0;
     m_nSendCount = 0;
 
@@ -97,6 +73,53 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+/*
+    函数功能:更新串口列表
+*/
+void MainWindow::updateComList()
+{
+    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+    {
+        bool isNew = true;
+        LOG(INFO) << "Name:" << info.portName().toStdString() << endl
+                  << "Description:"<<info.description().toStdString() <<endl
+                  << "Manufacturer:"<<info.manufacturer().toStdString();
+
+        SerialPortInfo serialPortInfo;
+
+        for (int i = 0; i < m_pComlist->size(); i++)
+        {
+            SerialPortInfo *pInfo = &m_pComlist->operator[](i);
+            if (pInfo->m_serial->portName() == info.portName())
+            {
+                isNew = false;
+                break;
+            }
+        }
+        if (isNew == false)
+        {
+            continue;
+        }
+        //这里相当于自动识别串口号之后添加到了cmb，如果要手动选择可以用下面列表的方式添加进去
+        serialPortInfo.m_serial->setPort(info);
+        if(serialPortInfo.m_serial->open(QIODevice::ReadWrite))
+        {
+            m_pComlist->append(serialPortInfo);
+            //将串口号添加到cmb
+            ui->comboBoxIsActiveCom->addItem(info.portName());
+            //关闭串口等待人为(打开串口按钮)打开
+            serialPortInfo.m_serial->close();
+            m_nComCount++;
+        }
+    }
+    if (m_nComCount == 0)
+    {
+        ui->comboBoxIsActiveCom->addItem("无端口连接");
+        LOG(INFO) << "无端口连接";
+    }
+
 }
 
 /*
@@ -510,7 +533,9 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
     obj.insert("地址", (uchar)pCurInfo->m_abyAddr[1]);
 
     /* 插入数据库 */
-    if(!m_sqlQuery.exec(QString("INSERT INTO TH015 VALUES('%1', '%2', '%3', '%4')").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")).arg((float)pOut/10000).arg((float)cOut/10000).arg((float)tOut/100)))
+    if(!m_sqlQuery.exec(QString("INSERT INTO TH015A VALUES('%1', '%2', '%3', '%4', '%5')").
+                        arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.z")).
+                        arg((float)pOut/10000).arg((float)cOut/10000).arg((float)tOut/100).arg((uchar)pCurInfo->m_abyAddr[1])))
     {
 
         qDebug() << m_sqlQuery.lastError();
@@ -597,7 +622,7 @@ void MainWindow::SendMsgFunc(int nIndex)
             {
                 serial->write(abyd);
                 m_nSendCount++;
-                QTimer::singleShot(1000, this,[=](){this->readDeviceData(deviceSbInfo);} );
+                QTimer::singleShot(m_nReadTimeGap, this,[=](){this->readDeviceData(deviceSbInfo);} );
 
             }
         }
@@ -729,17 +754,18 @@ void MainWindow::on_pushButton_readSet_clicked()
     if (fRet == 0)
     {
         mainWidgetPrint("设置时间格式错误", textEditPrint);
+        LOG(WARNING)<<QString("设置时间格式错误").toStdString();
     }
     else if(0.5>fRet || fRet>60)
     {
         mainWidgetPrint("设置时间范围出错 实际表数*(0.5~60)", textEditPrint);
+        LOG(WARNING)<<QString("设置时间范围出错 实际表数*(0.5~60)").toStdString();
     }
     else
     {
         m_nReadTimeGap = fRet*1000;
         mainWidgetPrint("重设间隔为:" + QString::number(fRet) + "秒", textEditPrint);
-        on_pushButtonReadData_clicked();
-        on_pushButtonReadData_clicked();
+        LOG(INFO)<<QString("重设间隔为:%1秒").arg(fRet).toStdString();
     }
 
 }

@@ -145,7 +145,6 @@ RtChartForm::RtChartForm(QWidget *parent) :
     m_strlistAlert = new QStringList;
     m_strListModelAlert = new QStringListModel;
     m_strListModelAlert->setStringList(*m_strlistAlert);
-    m_strListModelAlert;
     ui->listView_alert->setModel(m_strListModelAlert);
 
     m_nXIndex = 0;
@@ -191,6 +190,9 @@ void RtChartForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
     {
         m_dateTimeAxisX->setMin(QDateTime::fromMSecsSinceEpoch(x - m_dateTimeAxisX->max().toMSecsSinceEpoch() + m_dateTimeAxisX->min().toMSecsSinceEpoch()));
         m_dateTimeAxisX->setMax(QDateTime::currentDateTime());
+        m_Series->remove(m_Series->points().first());
+        m_SeriesDensity->remove(m_SeriesDensity->points().first());
+        m_SeriesTemperature->remove(m_SeriesTemperature->points().first());
 
     }
     if (p > 6000 || t > 6000 || c > 6000 && m_strListModelAlert->rowCount()<200)
@@ -202,9 +204,13 @@ void RtChartForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
 
     }
 
+
     m_Series->append(x, (float)p/10000 - 0.1);
+
     m_SeriesDensity->append(x, (float)c/10000 - 0.1);
+
     m_SeriesTemperature->append(x, (float)t/100);
+    //qDebug()<<m_Series->count()<<m_SeriesDensity->count()<<m_SeriesTemperature->count()<<this;
 
 }
 

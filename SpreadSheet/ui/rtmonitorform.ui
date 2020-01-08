@@ -41,14 +41,14 @@
        <item>
         <widget class="QPushButton" name="pushButton_addDash">
          <property name="text">
-          <string>添加表盘(顺序)</string>
+          <string>添加表盘测试(顺序)</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_removeDash">
          <property name="text">
-          <string>移除表盘(顺序)</string>
+          <string>移除表盘测试(顺序)</string>
          </property>
         </widget>
        </item>

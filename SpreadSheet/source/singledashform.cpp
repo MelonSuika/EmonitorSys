@@ -37,6 +37,13 @@ void SingleDashForm::setDashData(QJsonObject *data)
     ui->lineEdit_temperature->setText(QString::asprintf("%.2f", (float)t/100));
     ui->lineEdit_pressure->setText(QString::asprintf("%.3f", (float)p/10000 - 0.1));
     ui->lineEdit_density->setText(QString::asprintf("%.3f", (float)c/10000 - 0.1));
+    if (c > 4500)
+    {
+        this->setStyleSheet(("background-color: rgb(255, 0, 0)"));
+    }
+    else {
+        this->setStyleSheet(("background-color: rgba(0, 255, 0, 10)"));
+    }
 
 
 }

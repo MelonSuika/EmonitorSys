@@ -16,10 +16,16 @@
   <property name="windowTitle">
    <string>实时界面</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <property name="currentIndex">
    <number>0</number>
   </property>
   <widget class="QWidget" name="tab_main">
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <attribute name="title">
     <string>主界面</string>
    </attribute>

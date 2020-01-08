@@ -8,6 +8,7 @@ AddChildDeviceForm::AddChildDeviceForm(QWidget *parent) :
     ui->setupUi(this);
 
     m_pComlist = nullptr;
+    m_pSetting = new QSettings("./config.ini", QSettings::IniFormat);
 
     ui->tableWidget->setRowCount(64); //设置行数为64
     ui->tableWidget->setColumnCount(5);
@@ -22,9 +23,6 @@ AddChildDeviceForm::AddChildDeviceForm(QWidget *parent) :
     ui->horizontalLayout->setStretch(0, 6);
     ui->horizontalLayout->setStretch(1, 3);
 
-    //this->setAttribute(Qt::WA_DeleteOnClose);
-    //ui->comboBox_com->showPopup();
-    //ui->comboBox_type->showPopup();
 }
 
 AddChildDeviceForm::~AddChildDeviceForm()
@@ -50,7 +48,6 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
     if (pComlist->size() == 0)
     {
         ui->comboBox_com->addItem("无连接端口");
-        //QMessageBox::warning(NULL, QStringLiteral("警告"), QStringLiteral("无连接端口信息"), QMessageBox::Ok);
     }
 
     ui->comboBox_type->addItem(TYPE_NONE + "未设置类型(0)");
@@ -79,7 +76,7 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
     函数功能:
     添加或者修改设备信息
 */
-void AddChildDeviceForm::on_pushButton_ok_clicked()
+void AddChildDeviceForm::on_pushButton_add_clicked()
 {
     if (m_pComlist->size() == 0)
     {
@@ -90,6 +87,7 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
     {
         SerialPortInfo *portInfo = &m_pComlist->operator[](i);
         bool flag = false;
+        /* 地址和设备类型决定设备 */
         QString str = ui->lineEdit_addr->text();
         int nDType = comtextToType(ui->comboBox_type->currentText());
         /* 未选类型，警告并返回 */
@@ -115,6 +113,11 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
 
             }
         }
+        else
+        {
+            /* 串口号不一致，直接查找下一个串口 */
+            continue;
+        }
         if (flag == false)
         {
             portInfo->m_nDeviceType = nDType;
@@ -126,7 +129,9 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
             info.m_nDeviceType = nDType;
 
             qDebug()<<"新增地址为:"<<QString::number(info.m_abyAddr[0], 16)<<QString::number((uchar)info.m_abyAddr[1], 16);
+            LOG(INFO)<<QString("新增地址为:%1").arg((uchar)info.m_abyAddr[1]).toStdString();
             m_pComlist->operator[](i).m_pDeviceList->append(info);
+            m_pSetting->setValue("address/"+QString::number((uchar)info.m_abyAddr[1]), nDType);
             for (int k = 0; ; k++)
             {
                 if(ui->tableWidget->item(k, 0) == nullptr)
@@ -163,3 +168,47 @@ void AddChildDeviceForm::on_pushButton_ok_clicked()
 }
 
 
+/*
+    函数功能:
+    加载配置文件
+*/
+void AddChildDeviceForm::on_pushButton_onloadIni_clicked()
+{
+    if (m_pComlist->size() == 0)
+    {
+        return;
+    }
+
+    int index = 0;
+    m_pSetting->beginGroup("address");
+    int size = m_pSetting->allKeys().size();
+
+    int nComIndex = 0;
+    /* 匹配串口 */
+    for (int i = 0; i < m_pComlist->size(); i++)
+    {
+        if (m_pComlist->operator[](i).m_serial->portName() == ui->comboBox_com->currentText())
+        {
+            nComIndex = i;
+            break;
+        }
+
+    }
+    for(int i = 0; i < size; i++)
+    {
+        QString strAddress = m_pSetting->allKeys().at(i);
+        QString strDeviceType = m_pSetting->value(strAddress).toString();
+        ui->tableWidget->setItem(index, 0, new QTableWidgetItem(QString::number(index+1)));
+        ui->tableWidget->setItem(index, 1, new QTableWidgetItem(ui->comboBox_com->currentText()));
+        ui->tableWidget->setItem(index, 2, new QTableWidgetItem(strAddress));
+        ui->tableWidget->setItem(index, 3, new QTableWidgetItem(strDeviceType));
+        DeviceInfo info;
+        int n = strAddress.toInt();
+        info.m_abyAddr[0] = 0;
+        info.m_abyAddr[1] = n;
+        info.m_nDeviceType = strDeviceType.toInt();
+        m_pComlist->operator[](nComIndex).m_pDeviceList->append(info);
+        index++;
+    }
+    m_pSetting->endArray();
+}

@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
     {
         LOG(INFO) << "TH3 Table Created!";
     }
-    if (!sqlQuery.exec("create table TH015(time datetime primary key, pressure float, density float, temperature float)"))
+    if (!sqlQuery.exec("create table TH015A(time datetime primary key, pressure float, density float, temperature float, address ushort)"))
     {
         LOG(WARNING) << "Error: Fail to create table015." << sqlQuery.lastError().text().toStdString();
     }
     else
     {
-        LOG(INFO) << "TH15 Table Created!";
+        LOG(INFO) << "TH15A Table Created!";
     }
 
     MainWindow w;

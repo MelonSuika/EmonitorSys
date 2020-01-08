@@ -24,21 +24,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 
-INCLUDEPATH += \
-        ./include   \
+# 通用模块
+INCLUDEPATH += ./include
 INCLUDEPATH += $$PWD/spreadsheet
 INCLUDEPATH += $$PWD/glog
 INCLUDEPATH += $$PWD/qcustomplot
 
 include     ($$PWD/qcustomplot/qcustomplot.pri)
 include     ($$PWD/glog/glog.pri)
+include     ($$PWD/spreadsheet/spreadsheet.pri)
+
+
+# 主要的几个窗口模块分类
+INCLUDEPATH += $$PWD/datasheetform
+INCLUDEPATH += $$PWD/chartform
+
+include     ($$PWD/datasheetform/datasheetform.pri)
+include     ($$PWD/chartform/chartform.pri)
+
+
 
 SOURCES += \
-    ./source/chartform.cpp \
     ./source/common.cpp \
     ./source/dashboardform.cpp \
     ./source/dashboardtabwidget.cpp \
-    ./source/datasheetform.cpp \
         ./source/main.cpp \
         ./source/mainwindow.cpp \
     ./source/rtchartform.cpp \
@@ -55,15 +64,12 @@ SOURCES += \
     ./source/singledash.cpp \
     ./source/pagenavigator.cpp \
     ./source/aboutform.cpp \
-    ./source/sqlchartformObject.cpp \
 
 HEADERS += \
-    ./include/chartform.h \
     ./include/common.h \
         ./include/connection.h \
     ./include/dashboardform.h \
     ./include/dashboardtabwidget.h \
-    ./include/datasheetform.h \
         ./include/mainwindow.h \
     ./include/rtchartform.h \
     ./include/rtdatasheetform.h \
@@ -80,14 +86,11 @@ HEADERS += \
     ./include/pagenavigator.h \
     ./include/loadqss.h \
     ./include/aboutform.h \
-    ./include/sqlchartformObject.h \
 
 UI_DIR=./ui
 FORMS += \
-        ./ui/chartform.ui \
         ./ui/dashboardform.ui \
         ./ui/dashboardtabwidget.ui \
-        ./ui/datasheetform.ui \
         ./ui/mainwindow.ui \
         ./ui/rtchartform.ui \
         ./ui/rtdatasheetform.ui \

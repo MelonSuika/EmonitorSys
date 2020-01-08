@@ -19,11 +19,14 @@ public:
     void Create(QList<SerialPortInfo> *pComlist);
 
 private slots:
-    void on_pushButton_ok_clicked();
+    void on_pushButton_add_clicked();
+
+    void on_pushButton_onloadIni_clicked();
 
 private:
     Ui::AddChildDeviceForm *ui;
     QList<SerialPortInfo> *m_pComlist;
+    QSettings *m_pSetting;
 };
 
 #endif // ADDCHILDDEVICEFORM_H

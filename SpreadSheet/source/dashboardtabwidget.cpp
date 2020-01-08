@@ -43,5 +43,6 @@ void DashBoardTabWidget::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbI
         Note:这边最好将单设备和多设备的界面信号分开来处理
     */
     emit sendRtData(data, deviceSbInfo);
+
 }
 

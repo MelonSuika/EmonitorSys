@@ -2,8 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "spreadsheet.h"
-#include "console.h"
 #include <QSqlQuery>
 #include <QDebug>
 #include <QSqlError>
@@ -17,7 +15,7 @@
 #include "myqquickwidget.h"
 #include "dashboardtabwidget.h"
 #include "aboutform.h"
-
+#include "spreadsheet.h"
 
 namespace Ui {
 class MainWindow;
@@ -96,10 +94,12 @@ private slots:
 
     void on_actionOrange_triggered();
 
+    void updateComList();
+
 private:
     Ui::MainWindow *ui;
     SpreadSheet *m_pSpreadSheet;
-    Console *m_console = nullptr;
+    //Console *m_console = nullptr;
     /* 串口数组 */
     QTimer *m_delayTimer;       /* 延时读取timer */
 

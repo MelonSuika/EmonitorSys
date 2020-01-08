@@ -5,5 +5,6 @@
         <file>../image/bitbug_favicon_128.ico</file>
         <file>../image/lsPNG.png</file>
         <file>../image/down_arrow.png</file>
+        <file>../image/main.png</file>
     </qresource>
 </RCC>
