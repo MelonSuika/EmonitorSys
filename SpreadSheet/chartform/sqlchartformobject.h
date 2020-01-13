@@ -9,7 +9,6 @@ class SQLChartFormObject : public QObject
 public:
     SQLChartFormObject();
 
-
 private slots:
     void readData(QDateTime start, QDateTime end);
 private:

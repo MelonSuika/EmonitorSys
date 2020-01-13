@@ -2,23 +2,25 @@
 
 SQLChartFormObject::SQLChartFormObject()
 {
-    //QSharedPointer<QCPGraphDataContainer>
-    //qRegisterMetaType();
-    //m_dataDensity_Time = QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer);
-    //m_dataPressure_Time = QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer);
-    //m_dataTemperature_Time = QSharedPointer<QCPGraphDataContainer>(new QCPGraphDataContainer);
-
     m_vctDDate = new QVector<double>;
     m_vctTemperature = new QVector<double>;
     m_vctDensity = new QVector<double>;
     m_vctPressure = new QVector<double>;
 }
 
+
+/*
+    函数功能:读数据库
+*/
 void SQLChartFormObject::readData(QDateTime start, QDateTime end)
 {
     /* 建立并打开数据库 */
-    QSqlDatabase dc = QSqlDatabase::addDatabase( "QSQLITE" , "cn3");
-    dc.setDatabaseName( "test.db");
+    QSqlDatabase dc = QSqlDatabase::database("cn3");
+    if (!dc.isOpen())
+    {
+        dc = QSqlDatabase::addDatabase( "QSQLITE" , "cn3");
+        dc.setDatabaseName( "test.db");
+    }
 
     if (!dc.open())
     {
@@ -39,9 +41,13 @@ void SQLChartFormObject::readData(QDateTime start, QDateTime end)
     qDebug()<<"exec"<<(isScd?"success":"fail");
 
     m_vctDDate->clear();
+    m_vctDDate->squeeze();
     m_vctDensity->clear();
+    m_vctDensity->squeeze();
     m_vctPressure->clear();
+    m_vctPressure->squeeze();
     m_vctTemperature->clear();
+    m_vctTemperature->squeeze();
 
     while(m_query->next())
     {
@@ -53,16 +59,15 @@ void SQLChartFormObject::readData(QDateTime start, QDateTime end)
         m_vctDensity->append(d);
         m_vctPressure->append(p);
         m_vctTemperature->append(t);
-        //m_dataDensity_Time->add(QCPGraphData(d, time));
-        //m_dataPressure_Time->add(QCPGraphData(p, time));
-        //m_dataTemperature_Time->add(QCPGraphData(t, time));
 
         n++;
-        if(n > 200000)
+        if(n > 86400*7)
             break;
     }
 
     emit loadOver(m_vctDensity, m_vctPressure, m_vctTemperature, m_vctDDate);
     qDebug()<<"over";
+
+    delete m_query;
 
 }
