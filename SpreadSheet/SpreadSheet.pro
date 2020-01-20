@@ -30,18 +30,21 @@ INCLUDEPATH += $$PWD/spreadsheet
 INCLUDEPATH += $$PWD/glog
 INCLUDEPATH += $$PWD/qcustomplot
 
+
 include     ($$PWD/qcustomplot/qcustomplot.pri)
 include     ($$PWD/glog/glog.pri)
 include     ($$PWD/spreadsheet/spreadsheet.pri)
 
 
+
 # 主要的几个窗口模块分类
 INCLUDEPATH += $$PWD/datasheetform
 INCLUDEPATH += $$PWD/chartform
+INCLUDEPATH += $$PWD/historyanalysisform
 
 include     ($$PWD/datasheetform/datasheetform.pri)
 include     ($$PWD/chartform/chartform.pri)
-
+include     ($$PWD/historyanalysisform/historyanalysisform.pri)
 
 
 SOURCES += \
@@ -64,6 +67,7 @@ SOURCES += \
     ./source/singledash.cpp \
     ./source/pagenavigator.cpp \
     ./source/aboutform.cpp \
+
 
 HEADERS += \
     ./include/common.h \
@@ -100,7 +104,7 @@ FORMS += \
         ./ui/rtmonitorform.ui \
         ./ui/singledashform.ui \
         ./ui/pagenavigator.ui \
-        ./ui/aboutform.ui
+        ./ui/aboutform.ui \
 
 #打印支持
 QT += printsupport

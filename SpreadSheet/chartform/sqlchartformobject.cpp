@@ -19,7 +19,7 @@ void SQLChartFormObject::readData(QDateTime start, QDateTime end)
     if (!dc.isOpen())
     {
         dc = QSqlDatabase::addDatabase( "QSQLITE" , "cn3");
-        dc.setDatabaseName( "test.db");
+        dc.setDatabaseName( DATABASENAME);
     }
 
     if (!dc.open())

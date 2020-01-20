@@ -9,6 +9,7 @@
 
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSqlQueryModel>
 
 #include <QTableView>
@@ -89,6 +90,9 @@ int comtextToType(QString str);
 
 /* log文件 */
 #define LOGFILE "run.log"
+
+/* 数据库名 */
+#define DATABASENAME "MTBF.db"
 
 
 #endif // COMMON_H

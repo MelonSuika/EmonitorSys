@@ -264,7 +264,7 @@
               <item>
                <widget class="QGroupBox" name="groupBox_2">
                 <property name="title">
-                 <string>历史数据查询</string>
+                 <string>历史数据</string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_2">
                  <item>
@@ -282,7 +282,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="pushButtonSheet">
+                  <widget class="QPushButton" name="pushButtonSheet_historyAnalysis">
                    <property name="text">
                     <string>历史分析统计</string>
                    </property>

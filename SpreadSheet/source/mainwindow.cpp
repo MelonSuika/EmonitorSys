@@ -56,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_dBwdgt = nullptr;
     m_sheetForm = nullptr;
     m_chartForm = nullptr;
+    m_historyAnalysisForm = nullptr;
     m_setForm = nullptr;
     m_addForm = nullptr;
     m_gasQuickForm = nullptr;
@@ -133,16 +134,6 @@ void MainWindow::errorFunc(QSerialPort::SerialPortError err)
     }
 }
 
-
-/*
-    函数功能:数据表显示
-*/
-void MainWindow::on_pushButtonSheet_clicked()
-{
-    m_pSpreadSheet = new SpreadSheet(13, 6);
-    m_pSpreadSheet->show();
-    m_pSpreadSheet->layout()->setSizeConstraint(QLayout::SetFixedSize);
-}
 
 /*
     函数功能:串口通信测试
@@ -909,4 +900,17 @@ void MainWindow::upDateComComboBox()
 
 }
 
+/*
+    函数功能：历史查询
 
+*/
+void MainWindow::on_pushButtonSheet_historyAnalysis_clicked()
+{
+    if (m_historyAnalysisForm == nullptr)
+    {
+        m_historyAnalysisForm = new HistoryAnalysisForm;
+    }
+
+    m_historyAnalysisForm->show();
+
+}

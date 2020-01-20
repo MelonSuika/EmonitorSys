@@ -16,6 +16,7 @@
 #include "dashboardtabwidget.h"
 #include "aboutform.h"
 #include "spreadsheet.h"
+#include "historyanalysisform.h"
 
 namespace Ui {
 class MainWindow;
@@ -49,8 +50,6 @@ private slots:
     bool nativeEvent(const QByteArray &eventType, void *message, long *result);
 
     void errorFunc(QSerialPort::SerialPortError err);
-
-    void on_pushButtonSheet_clicked();
 
     void on_pushButtonSerial_clicked();
 
@@ -96,9 +95,10 @@ private slots:
 
     void updateComList();
 
+    void on_pushButtonSheet_historyAnalysis_clicked();
+
 private:
     Ui::MainWindow *ui;
-    SpreadSheet *m_pSpreadSheet;
     //Console *m_console = nullptr;
     /* 串口数组 */
     QTimer *m_delayTimer;       /* 延时读取timer */
@@ -118,6 +118,8 @@ private:
     QPointer<DataSheetForm> m_sheetForm;
     /* 曲线图界面 */
     QPointer<ChartForm> m_chartForm;
+    /* 历史分析界面 */
+    QPointer<HistoryAnalysisForm> m_historyAnalysisForm;
     /* 设置界面 */
     QPointer<SetDeviceTypeForm> m_setForm;
     /* 添加子设备界面 */

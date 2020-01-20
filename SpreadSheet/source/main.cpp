@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
     /* 添加一个连接名为cnct1的SQLITE数据库连接 */
     QSqlDatabase db = QSqlDatabase::addDatabase( "QSQLITE");
-    db.setDatabaseName( "test.db" );
+    db.setDatabaseName( DATABASENAME );
 
     if (!db.open())
     {
