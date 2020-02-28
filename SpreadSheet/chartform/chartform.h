@@ -35,13 +35,18 @@ private slots:
     void disPlay(QVector<double>*,QVector<double>*,QVector<double>*,QVector<double>*);
 
     void custPlotMoveEvent(QMouseEvent*);
+    void on_lineEdit_select_textChanged(const QString &arg1);
+
+    void on_lineEdit_address_textChanged(const QString &arg1);
+
 signals:
-    void onLoad(QDateTime, QDateTime);
+    void onLoad(QDateTime, QDateTime, unsigned int);
 private:
     Ui::ChartForm *ui;
 
     QDateTime m_startDt;
     QDateTime m_endDt;
+    unsigned int m_nQueryAddress;
 
     QChart *m_chart;
     QChartView *m_chartView;

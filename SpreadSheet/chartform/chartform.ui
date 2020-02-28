@@ -98,6 +98,13 @@
           <string>筛选信息</string>
          </property>
          <layout class="QGridLayout" name="gridLayout">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_start">
+            <property name="text">
+             <string>起始时间:</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="2">
            <spacer name="horizontalSpacer">
             <property name="orientation">
@@ -111,6 +118,16 @@
             </property>
            </spacer>
           </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_select"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_end">
+            <property name="text">
+             <string>结束时间:</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
            <widget class="QDateTimeEdit" name="dateTimeEdit_start">
             <property name="displayFormat">
@@ -118,10 +135,13 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_start">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEdit_address"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_address">
             <property name="text">
-             <string>起始时间:</string>
+             <string>地址</string>
             </property>
            </widget>
           </item>
@@ -138,13 +158,6 @@
             </property>
            </spacer>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_end">
-            <property name="text">
-             <string>结束时间:</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="1">
            <widget class="QDateTimeEdit" name="dateTimeEdit_end">
             <property name="displayFormat">
@@ -159,9 +172,6 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_select"/>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_date">
             <property name="text">
@@ -169,15 +179,20 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="lineEdit_address"/>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_statis">
+         <property name="title">
+          <string>统计信息</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QLineEdit" name="lineEdit_cosumeTime"/>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_address">
-            <property name="text">
-             <string>地址</string>
-            </property>
-           </widget>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_totalCount"/>
           </item>
          </layout>
         </widget>

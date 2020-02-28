@@ -166,3 +166,15 @@ void DataSheetForm::on_pushButton_gotoPage_clicked()
     m_nCurrentPage = nPage;
     upDatePageInfo();
 }
+
+/*
+    函数功能:打印
+*/
+void DataSheetForm::on_pushButton_print_clicked()
+{
+    QPrinter printer;
+    QString printerName = printer.printerName();
+    //if (printerName.size() == 0)
+
+    qDebug()<<printerName;
+}

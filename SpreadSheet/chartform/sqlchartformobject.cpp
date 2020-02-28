@@ -12,7 +12,7 @@ SQLChartFormObject::SQLChartFormObject()
 /*
     函数功能:读数据库
 */
-void SQLChartFormObject::readData(QDateTime start, QDateTime end)
+void SQLChartFormObject::readData(QDateTime start, QDateTime end, unsigned int u32Addr)
 {
     /* 建立并打开数据库 */
     QSqlDatabase dc = QSqlDatabase::database("cn3");
@@ -35,8 +35,16 @@ void SQLChartFormObject::readData(QDateTime start, QDateTime end)
     m_query = new QSqlQuery(dc);
     int n = 0;
     bool isScd = false;
-    isScd = m_query->exec(QString("SELECT time, pressure, density, temperature FROM TH015A WHERE time > '%1' and time < '%2';").
-                          arg(start.toString("yyyy-MM-dd hh:mm")).arg(end.toString("yyyy-MM-dd hh:mm")));
+    if (u32Addr == 0)
+    {
+        isScd = m_query->exec(QString("SELECT time, pressure, density, temperature FROM TH015A WHERE time > '%1' and time < '%2';").
+                            arg(start.toString("yyyy-MM-dd hh:mm")).arg(end.toString("yyyy-MM-dd hh:mm")));
+    }
+    else
+    {
+        isScd = m_query->exec(QString("SELECT time, pressure, density, temperature FROM TH015A WHERE time > '%1' and time < '%2' and address == '%3';").
+                            arg(start.toString("yyyy-MM-dd hh:mm")).arg(end.toString("yyyy-MM-dd hh:mm")).arg(u32Addr));
+    }
 
     qDebug()<<"exec"<<(isScd?"success":"fail");
 

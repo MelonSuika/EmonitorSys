@@ -10,7 +10,7 @@ public:
     SQLChartFormObject();
 
 private slots:
-    void readData(QDateTime start, QDateTime end);
+    void readData(QDateTime start, QDateTime end, unsigned int);
 private:
     QSqlQueryModel *m_model;
     QSqlQuery *m_query;

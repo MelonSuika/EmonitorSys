@@ -33,6 +33,8 @@
 #include <QThread>
 #include <QSettings>
 
+#include <QPrinter>
+
 /* windows下宏冲突，添加该宏防止编译报错 */
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 #include "glog/config.h"

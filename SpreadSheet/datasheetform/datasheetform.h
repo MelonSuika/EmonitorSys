@@ -32,6 +32,8 @@ private slots:
 
     void on_pushButton_gotoPage_clicked();
 
+    void on_pushButton_print_clicked();
+
 private:
     Ui::DataSheetForm *ui;
 

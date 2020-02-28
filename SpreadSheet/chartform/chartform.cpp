@@ -87,6 +87,11 @@ ChartForm::ChartForm(QWidget *parent) :
     /* 仅水平方向可拖拽 */
     ui->customPlot->axisRect()->setRangeDrag(Qt::Horizontal);
 
+    /* 垂直方向可缩放改变 */
+    ui->customPlot->axisRect()->setRangeZoom(Qt::Vertical);
+    /* 垂直方向可拖拽 */
+    ui->customPlot->axisRect()->setRangeDrag(Qt::Vertical);
+
     /* active calendar */
     ui->dateTimeEdit_start->setCalendarPopup(true);
     ui->dateTimeEdit_end->setCalendarPopup(true);
@@ -100,8 +105,8 @@ ChartForm::ChartForm(QWidget *parent) :
     m_sqlChartFormObj = new SQLChartFormObject;
     m_sqlChartFormObj->moveToThread(m_sqlProcess);
 
-
-    connect(this, SIGNAL(onLoad(QDateTime, QDateTime)), m_sqlChartFormObj, SLOT(readData(QDateTime, QDateTime)));
+    /* 生成按钮与数据处理线程绑定 */
+    connect(this, SIGNAL(onLoad(QDateTime, QDateTime, unsigned int)), m_sqlChartFormObj, SLOT(readData(QDateTime, QDateTime, unsigned int)));
     connect(m_sqlChartFormObj, SIGNAL(loadOver(QVector<double>*,QVector<double>*,QVector<double>*,QVector<double>*)),
             this, SLOT(disPlay(QVector<double>*, QVector<double>*,QVector<double>*,QVector<double>*)));
     connect(ui->customPlot, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(custPlotMoveEvent(QMouseEvent*)));
@@ -117,7 +122,7 @@ void ChartForm::on_pushButton_display_clicked()
 {
 
     m_timeConsume.start();
-    emit onLoad(m_startDt, m_endDt);
+    emit onLoad(m_startDt, m_endDt, m_nQueryAddress);
     ui->customPlot->xAxis->setRange(QDateTime::fromString(ui->dateTimeEdit_start->text(), "yyyy-MM-dd hh:mm").toSecsSinceEpoch(),
                                         QDateTime::fromString(ui->dateTimeEdit_end->text(), "yyyy-MM-dd hh:mm").toSecsSinceEpoch());
     qDebug()<<"emit onLoad";
@@ -164,7 +169,8 @@ void ChartForm::disPlay(QVector<double>*d,QVector<double>*p,QVector<double>*t,QV
     ui->customPlot->graph(1)->setData(*dd, *t);
     ui->customPlot->graph(2)->setData(*dd, *p);
     ui->customPlot->replot();
-    qDebug()<<m_timeConsume.elapsed()<<"ms";
+    ui->lineEdit_cosumeTime->setText(QString("操作耗时:%1ms").arg(m_timeConsume.elapsed()));
+    ui->lineEdit_totalCount->setText(QString("记录数:%1").arg(p->size()));
 
 }
 
@@ -221,4 +227,14 @@ void ChartForm::custPlotMoveEvent(QMouseEvent *e)
     QToolTip::showText(cursor().pos(), str, ui->customPlot);
 
 
+}
+
+void ChartForm::on_lineEdit_select_textChanged(const QString &arg1)
+{
+
+}
+
+void ChartForm::on_lineEdit_address_textChanged(const QString &arg1)
+{
+    m_nQueryAddress = arg1.toUInt();
 }
