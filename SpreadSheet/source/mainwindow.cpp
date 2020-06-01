@@ -287,7 +287,7 @@ void analysisTH(QByteArray dataIn, int &tOut, int &hOut)
 */
 void analysisHM100PR(QByteArray dataIn, int &tOut, int &pOut, int &cOut)
 {
-    tOut = ((uchar)dataIn[3]*256) + ((uchar)dataIn[4]);
+    tOut = ((uchar)dataIn[3]*256) + (uchar)dataIn[4];
     pOut = ((uchar)dataIn[5]*256) + (uchar)dataIn[6];
     cOut = ((uchar)dataIn[7]*256) + (uchar)dataIn[8];
 }
@@ -747,7 +747,7 @@ void MainWindow::on_pushButton_readSet_clicked()
         mainWidgetPrint("设置时间格式错误", textEditPrint);
         LOG(WARNING)<<QString("设置时间格式错误").toStdString();
     }
-    else if(0.5>fRet || fRet>60)
+    else if(0.1>fRet || fRet>60)
     {
         mainWidgetPrint("设置时间范围出错 实际表数*(0.5~60)", textEditPrint);
         LOG(WARNING)<<QString("设置时间范围出错 实际表数*(0.5~60)").toStdString();
