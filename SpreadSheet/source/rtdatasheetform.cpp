@@ -27,6 +27,7 @@ RtDataSheetForm::~RtDataSheetForm()
 
 void RtDataSheetForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
 {
+    qDebug()<<"33333"<<deviceSbInfo.nDMJType;
     if (deviceSbInfo.nDeviceIndex > 0)
         return;
 

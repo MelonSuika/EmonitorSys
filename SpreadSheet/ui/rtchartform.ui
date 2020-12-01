@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>638</width>
-    <height>460</height>
+    <height>467</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,6 +27,38 @@
       <layout class="QVBoxLayout" name="verticalLayout_control">
        <item>
         <widget class="QComboBox" name="comboBox"/>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_changeDMJ">
+         <property name="styleSheet">
+          <string notr="true">border: 0px;</string>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,3">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>表计切换</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox_addrList"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit_addr"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_clear">
+         <property name="text">
+          <string>clear</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton">

@@ -18,7 +18,8 @@ public:
     bool m_isChkAdrCmd;         /* 查询地址命令 */
 
     QList<DeviceInfo> *m_pDeviceList;
-    int m_nDeviceType;
+    int m_nDeviceType;          /* 协议类型 */
+    //int m_nDMJType;             /* 表类型 */
 
 private slots:
     void errorFunc(QSerialPort::SerialPortError error/*QSerialPort serial*/);

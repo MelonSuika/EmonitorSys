@@ -42,6 +42,10 @@ void DashBoardTabWidget::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbI
     /*
         Note:这边最好将单设备和多设备的界面信号分开来处理
     */
+    int t = data->value("温度").toInt();
+    int p = data->value("压力").toInt();
+    int c = data->value("密度").toInt();
+    qDebug()<<"first data:t, p, c, address, DMJType"<<t<<p<<c<<deviceSbInfo.nAddress<<deviceSbInfo.nDMJType;
     emit sendRtData(data, deviceSbInfo);
 
 }

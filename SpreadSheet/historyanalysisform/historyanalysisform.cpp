@@ -29,9 +29,9 @@ HistoryAnalysisForm::HistoryAnalysisForm(QWidget *parent) :
     /***********
      *  图初始化***
      * *********/
-    ui->widget_customPlot->xAxis->setLabel("密度(MPa)");
+    ui->widget_customPlot->xAxis->setLabel("压力(MPa)");
     ui->widget_customPlot->yAxis->setLabel("数量");
-    ui->widget_customPlot->xAxis->setRange(-0.2, 0.9);
+    ui->widget_customPlot->xAxis->setRange(0.0, 1.0);
     // set dark background gradient: 设置暗背景渐变
     QLinearGradient gradient(0, 0, 0, 400);
     gradient.setColorAt(0, QColor(90, 90, 90));// 开始颜色为黑色
@@ -50,14 +50,14 @@ HistoryAnalysisForm::HistoryAnalysisForm(QWidget *parent) :
     // prepare x axis with country labels: //设置x轴标签
     QVector<double> ticks;
     QVector<QString> labels;
-    ticks << 0.1 << 0.2 << 0.3 << 0.4 << 0.5 << 0.6 << 0.7;
+    ticks << 0.1;
     labels << "USA" << "Japan" << "Germany" << "France" << "UK" << "Italy" << "Canada";
 
 
     //ui->widget_customPlot->
     // Add data:添加数据
     QVector<double> regenData;
-    regenData   << 0.06*10.5 << 0.05*5.5 << 0.04*5.5 << 0.06*5.8 << 0.02*5.2 << 0.07*4.2 << 0.25*11.2;
+    regenData   << 1 << 2 << 3 << 4 << 0.02*5.2 << 0.07*4.2 << 0.25*11.2;
 
     barCount->setData(ticks, regenData);
 

@@ -37,12 +37,12 @@ void SQLChartFormObject::readData(QDateTime start, QDateTime end, unsigned int u
     bool isScd = false;
     if (u32Addr == 0)
     {
-        isScd = m_query->exec(QString("SELECT time, pressure, density, temperature FROM TH015A WHERE time > '%1' and time < '%2';").
+        isScd = m_query->exec(QString("SELECT time, pressure, density, temperature FROM TH015AD WHERE time > '%1' and time < '%2';").
                             arg(start.toString("yyyy-MM-dd hh:mm")).arg(end.toString("yyyy-MM-dd hh:mm")));
     }
     else
     {
-        isScd = m_query->exec(QString("SELECT time, pressure, density, temperature FROM TH015A WHERE time > '%1' and time < '%2' and address == '%3';").
+        isScd = m_query->exec(QString("SELECT time, pressure, density, temperature FROM TH015AD WHERE time > '%1' and time < '%2' and address == '%3';").
                             arg(start.toString("yyyy-MM-dd hh:mm")).arg(end.toString("yyyy-MM-dd hh:mm")).arg(u32Addr));
     }
 

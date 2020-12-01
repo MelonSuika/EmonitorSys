@@ -12,6 +12,7 @@ public:
     int m_nDeviceType;             /* 设备类型 */
 
     int m_nReadErrorCount;         /* 读取异常次数 */
+    int m_nDMJType;                /* 表盘类型 */
 
 };
 

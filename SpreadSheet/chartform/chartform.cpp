@@ -20,9 +20,11 @@ ChartForm::ChartForm(QWidget *parent) :
     // configure bottom axis to show date instead of number:
     QSharedPointer<QCPAxisTickerDateTime> dateTicker(new QCPAxisTickerDateTime);
     dateTicker->setDateTimeFormat("MM-dd hh:mm:ss");
+    /*dateTicker->setTickCount(3);
+    dateTicker->setTickStepStrategy(QCPAxisTicker::TickStepStrategy::tssMeetTickCount);*/
+
     ui->customPlot->xAxis->setTicker(dateTicker);
     ui->customPlot->xAxis->setTickLabelRotation(65);
-
     ui->customPlot->yAxis->setLabel("密度(MPa)");
     ui->customPlot->yAxis2->setVisible(true);
     ui->customPlot->yAxis2->setLabel("温度(℃)");
@@ -61,7 +63,9 @@ ChartForm::ChartForm(QWidget *parent) :
     ui->customPlot->graph()->setLineStyle(QCPGraph::LineStyle::lsNone);
 
     /* 设置坐标范围 */
-    ui->customPlot->xAxis->setRange(QDateTime::currentDateTime().toTime_t(), QDateTime::currentDateTime().toTime_t() + 100);
+    uint x = QDateTime::currentDateTime().toTime_t();
+    //dateTicker->setTickOrigin(x);
+    ui->customPlot->xAxis->setRange(x, x + 100);
     ui->customPlot->yAxis->setRange(-0.2, 0.9);
     ui->customPlot->yAxis2->setRange(-40, 70);
 

@@ -63,7 +63,7 @@ void DataSheetForm::on_pushButton_query_clicked()
     m_timeLastSql.start();
     if (ui->lineEdit_address->text() == "")
     {
-        m_strCurrentSimpleQuery = QString("SELECT * FROM TH015A WHERE time > '%1' and time < '%2' ").
+        m_strCurrentSimpleQuery = QString("SELECT * FROM TH015AD WHERE time > '%1' and time < '%2' ").
                 arg(ui->dateTimeEdit_start->text()).arg(ui->dateTimeEdit_end->text());
         m_strCurrentQuery = m_strCurrentSimpleQuery + "limit '%1', '%2'";
 
@@ -71,7 +71,7 @@ void DataSheetForm::on_pushButton_query_clicked()
     }
     else
     {
-        m_strCurrentSimpleQuery = QString("SELECT * FROM TH015A WHERE time > '%1' and time < '%2'and address == '%3' ").
+        m_strCurrentSimpleQuery = QString("SELECT * FROM TH015AD WHERE time > '%1' and time < '%2'and address == '%3' ").
                 arg(ui->dateTimeEdit_start->text()).arg(ui->dateTimeEdit_end->text()).arg(ui->lineEdit_address->text());
         m_strCurrentQuery = m_strCurrentSimpleQuery + "limit '%1', '%2'";
         m_model->setQuery(m_strCurrentQuery.arg(0).arg(LINESPPAGE));

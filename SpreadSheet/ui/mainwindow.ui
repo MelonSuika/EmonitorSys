@@ -276,6 +276,13 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_eDisplayBoard">
+               <property name="text">
+                <string>电子展屏</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

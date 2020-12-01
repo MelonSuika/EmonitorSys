@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>configuration/pc.png</file>
+        <file>configuration/485.png</file>
+    </qresource>
+</RCC>

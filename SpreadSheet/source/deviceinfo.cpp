@@ -8,5 +8,4 @@ DeviceInfo::DeviceInfo()
     m_nDeviceType = 0;
     m_nReadErrorCount = 0;
 
-
 }

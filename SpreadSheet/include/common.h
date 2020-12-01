@@ -49,6 +49,8 @@
 #define HM_CHK_ADDR(addr, count) {0x00, 0x04, 0xff, 0x00, 0x00, count}
 #define HM_CHK_DATA(addr, count) {addr, 0x04, 0x00, 0x00, 0x00, count}
 
+/* RDH */
+#define RDH_CHK_DATA(addr, count) {addr, 0x04, 0x00, 0x00, 0x00, count}
 /* 设备信息，设备是由com口和设备号来标识的 */
 typedef struct deviceSymbolInfo
 {
@@ -56,6 +58,7 @@ typedef struct deviceSymbolInfo
     int nDeviceIndex;
     int nAddress;
     int nDeviceType;
+    int nDMJType;
 }DeviceSymbolInfo;
 
 enum DeviceType{
@@ -68,7 +71,21 @@ enum DeviceType{
     ZMJ100PRO,
     ZMJ100PRW,
     ZMJ100PRDH,
-    THC
+    THC,
+    RDH
+};
+
+/* 表盘类型 */
+enum DMJType{
+    DMJ_NONE = 0,
+    DMJ100PR_1 = 10,
+    DMJHM100PR_1 = 20,
+    DMJ60PR_1 = 30,
+    DMJ100PRW_1 = 40,
+    DMJ100PRW_2,
+    DT_1  = 50,
+    DMJ45PR_1 = 60,
+    DMJ_RDH_1 = 70,
 };
 
 #define COM_COUNT_MAX 128
@@ -88,13 +105,18 @@ enum DeviceType{
 #define SKIN_DARK ":/qss/widget-black.qss"
 #define SKIN_ORANGE ":/qss/widget-darkOrange.qss"
 
+/* ep material前缀 */
+#define PRE_FILEHREADER "./"
+
 int comtextToType(QString str);
+int comtext2DMJType(QString str);
+int Arg2DMJType(QString arg);
 
 /* log文件 */
 #define LOGFILE "run.log"
 
 /* 数据库名 */
-#define DATABASENAME "MTBF.db"
+#define DATABASENAME "MTBF2.db"
 
 
 #endif // COMMON_H

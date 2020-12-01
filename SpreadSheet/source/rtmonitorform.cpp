@@ -27,6 +27,8 @@ RtMonitorForm::~RtMonitorForm()
 void RtMonitorForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
 {
 
+    qDebug()<<"22222"<<deviceSbInfo.nDMJType;
+    qDebug()<<"rtMonitor's dmj"<<deviceSbInfo.nDMJType;
     int n;
     bool flag = false;
     int a = data->value("地址").toInt();

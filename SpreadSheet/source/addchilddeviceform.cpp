@@ -15,7 +15,7 @@ AddChildDeviceForm::AddChildDeviceForm(QWidget *parent) :
 
     /* 设置列名 */
     QStringList headers;
-    headers<< "表号"<<"端口号"<<"地址"<<"表类型"<<"位置";
+    headers<< "表号"<<"端口号"<<"地址"<<"类型(协议)"<<"表盘类型";
     ui->tableWidget->setHorizontalHeaderLabels(headers);
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
@@ -55,8 +55,11 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
     ui->comboBox_type->addItem("60R(4)048");
     ui->comboBox_type->addItem("100R(4)高压015");
     ui->comboBox_type->addItem("100R(4)普压009");
-    ui->comboBox_type->addItem("100RDH(5)微水");
+    ui->comboBox_type->addItem("100RDH(9)微水");
     ui->comboBox_type->addItem("THC(8)温湿度控制器");
+    ui->comboBox_type->addItem("100PRW_1(4)无线");
+    ui->comboBox_type->addItem("100PRW_2(4)无线");
+
 
     for (int i = 0; i < pComlist->size(); i++)
     {
@@ -67,6 +70,7 @@ void AddChildDeviceForm::Create(QList<SerialPortInfo> *pComlist)
             ui->tableWidget->setItem(index, 1, new QTableWidgetItem(portInfo.m_serial->portName()));
             ui->tableWidget->setItem(index, 2, new QTableWidgetItem(QString::number((uchar)portInfo.m_pDeviceList->operator[](j).m_abyAddr[1])));
             ui->tableWidget->setItem(index, 3, new QTableWidgetItem(QString::number(portInfo.m_pDeviceList->operator[](j).m_nDeviceType)));
+            ui->tableWidget->setItem(index, 4, new QTableWidgetItem(QString::number(portInfo.m_pDeviceList->operator[](j).m_nDMJType)));
             index++;
         }
     }
@@ -96,6 +100,9 @@ void AddChildDeviceForm::on_pushButton_add_clicked()
             QMessageBox::warning(NULL, QStringLiteral("警告"), QStringLiteral("请选择设备类型"), QMessageBox::Ok);
             return;
         }
+        /* 设备类型 */
+        int nDMJType = comtext2DMJType(ui->comboBox_type->currentText());
+        qDebug()<<"-------------nDMJType"<<nDMJType;
 
         /* 先查找串口号是否一致，
             再查找地址是否一致
@@ -121,17 +128,20 @@ void AddChildDeviceForm::on_pushButton_add_clicked()
         if (flag == false)
         {
             portInfo->m_nDeviceType = nDType;
+            //portInfo->m_nDMJType = nDMJType;
 
             DeviceInfo info;
             int n = str.toInt();
             info.m_abyAddr[0] = 0;
             info.m_abyAddr[1] = n;
             info.m_nDeviceType = nDType;
+            info.m_nDMJType = nDMJType;
+
 
             qDebug()<<"新增地址为:"<<QString::number(info.m_abyAddr[0], 16)<<QString::number((uchar)info.m_abyAddr[1], 16);
             LOG(INFO)<<QString("新增地址为:%1").arg((uchar)info.m_abyAddr[1]).toStdString();
             m_pComlist->operator[](i).m_pDeviceList->append(info);
-            m_pSetting->setValue("address/"+QString::number((uchar)info.m_abyAddr[1]), nDType);
+            m_pSetting->setValue("address/"+QString::number((uchar)info.m_abyAddr[1]), QString("%1,%2").arg(nDType).arg(nDMJType));
             for (int k = 0; ; k++)
             {
                 if(ui->tableWidget->item(k, 0) == nullptr)
@@ -140,6 +150,7 @@ void AddChildDeviceForm::on_pushButton_add_clicked()
                     ui->tableWidget->setItem(k, 1, new QTableWidgetItem(portInfo->m_serial->portName()));
                     ui->tableWidget->setItem(k, 2, new QTableWidgetItem(QString::number((uchar)info.m_abyAddr[1])));
                     ui->tableWidget->setItem(k, 3, new QTableWidgetItem(QString::number(nDType)));
+                    ui->tableWidget->setItem(k, 4, new QTableWidgetItem(QString::number(nDMJType)));
                     break;
                 }
             }
@@ -150,6 +161,7 @@ void AddChildDeviceForm::on_pushButton_add_clicked()
             {
                 /* 设备类型 */
                 portInfo->m_nDeviceType = nDType;
+                //portInfo->m_nDMJType = nDMJType;
                 for (int k = 0; ; k++)
                 {
                     if(ui->tableWidget->item(k, 0) == nullptr)
@@ -197,16 +209,21 @@ void AddChildDeviceForm::on_pushButton_onloadIni_clicked()
     for(int i = 0; i < size; i++)
     {
         QString strAddress = m_pSetting->allKeys().at(i);
-        QString strDeviceType = m_pSetting->value(strAddress).toString();
+        //QString strDeviceType = m_pSetting->value(strAddress).toString();
+        QString strType = m_pSetting->value(strAddress).toString();
+        QString strProtocol = strType.section(',', 0, 0).trimmed();
+        QString strDMJType = strType.section(',', 1, 1);
         ui->tableWidget->setItem(index, 0, new QTableWidgetItem(QString::number(index+1)));
         ui->tableWidget->setItem(index, 1, new QTableWidgetItem(ui->comboBox_com->currentText()));
         ui->tableWidget->setItem(index, 2, new QTableWidgetItem(strAddress));
-        ui->tableWidget->setItem(index, 3, new QTableWidgetItem(strDeviceType));
+        ui->tableWidget->setItem(index, 3, new QTableWidgetItem(strProtocol));
+        ui->tableWidget->setItem(index, 4, new QTableWidgetItem(strDMJType));;
         DeviceInfo info;
         int n = strAddress.toInt();
         info.m_abyAddr[0] = 0;
         info.m_abyAddr[1] = n;
-        info.m_nDeviceType = strDeviceType.toInt();
+        info.m_nDeviceType = strProtocol.toInt();
+        info.m_nDMJType = strDMJType.toInt();
         m_pComlist->operator[](nComIndex).m_pDeviceList->append(info);
         index++;
     }

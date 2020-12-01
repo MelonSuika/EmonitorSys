@@ -53,6 +53,7 @@ DashBoardForm::~DashBoardForm()
 
 void DashBoardForm::rcvRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo)
 {
+    /* 大盘只返回第一个表的信息 */
     if (deviceSbInfo.nDeviceIndex > 0)
         return;
     QString str = ui->lineEdit_address->text();

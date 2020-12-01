@@ -5,12 +5,15 @@
 #include <QStyleFactory>
 #include <QSqlError>
 #include <QSqlQuery>
-
+#include <iostream>
+using namespace std;
 using namespace GOOGLE_NAMESPACE;
+
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
 
+    // 1100 0000 .... 0000
+    QApplication a(argc, argv);
     /* 打开日志 */
     InitGoogleLogging(argv[0]);
     FLAGS_log_dir = "./";
@@ -29,7 +32,6 @@ int main(int argc, char *argv[])
     {
         LOG(INFO) << "Succeed to connect database.";
     }
-
     /* 创建表格 */
     QSqlQuery sqlQuery;
     if(!sqlQuery.exec("create table TH3(time datetime primary key, temperature int, humidity int)"))
@@ -40,7 +42,7 @@ int main(int argc, char *argv[])
     {
         LOG(INFO) << "TH3 Table Created!";
     }
-    if (!sqlQuery.exec("create table TH015A(time datetime primary key, pressure float, density float, temperature float, address ushort)"))
+    if (!sqlQuery.exec("create table TH015AD(time datetime primary key, pressure float, density float, temperature float, AD float, address ushort)"))
     {
         LOG(WARNING) << "Error: Fail to create table015." << sqlQuery.lastError().text().toStdString();
     }
@@ -48,9 +50,9 @@ int main(int argc, char *argv[])
     {
         LOG(INFO) << "TH15A Table Created!";
     }
-
     MainWindow w;
 
+    qDebug()<<"打开主界面";
     w.show();
     return a.exec();
 }

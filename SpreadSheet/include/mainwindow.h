@@ -17,6 +17,7 @@
 #include "aboutform.h"
 #include "spreadsheet.h"
 #include "historyanalysisform.h"
+#include "edispalyboardform.h"
 
 namespace Ui {
 class MainWindow;
@@ -42,6 +43,7 @@ signals:
     void sendRtData(QJsonObject *data, DeviceSymbolInfo deviceSbInfo);
     void sigSendMsg(int nIndex);
     void sigDelayRead(int nIndex);
+    void sigSendMainEp(QJsonObject *data, DeviceSymbolInfo deviceSbInfo);
 
 private slots:
 
@@ -97,6 +99,8 @@ private slots:
 
     void on_pushButtonSheet_historyAnalysis_clicked();
 
+    void on_pushButton_eDisplayBoard_clicked();
+
 private:
     Ui::MainWindow *ui;
     //Console *m_console = nullptr;
@@ -130,6 +134,8 @@ private:
     QPointer<MyQQuickWidget> m_gasQuickForm;
     /* 关于界面 */
     QPointer<AboutForm> m_aboutFrom;
+    /* 电子展屏 */
+    QPointer<EDispalyBoardForm> m_eDispalyBoardForm;
 
     QList<SerialPortInfo> *m_pComlist;
     int m_nComCount;

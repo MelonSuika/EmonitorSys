@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);    
 
+
     /* 隐去部分控件 */
     ui->pushButton_setDeviceType->hide();
 
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_addForm = nullptr;
     m_gasQuickForm = nullptr;
     m_aboutFrom = nullptr;
+    m_eDispalyBoardForm = nullptr;
     m_nCount = 0;
     m_nReadTimeGap = 1000;
     m_nRcvCount = 0;
@@ -285,13 +287,26 @@ void analysisTH(QByteArray dataIn, int &tOut, int &hOut)
 /*
     函数功能:HM100PR解析
 */
-void analysisHM100PR(QByteArray dataIn, int &tOut, int &pOut, int &cOut)
+void analysisHM100PR(QByteArray dataIn, int &tOut, int &pOut, int &cOut, int &adOut)
 {
     tOut = ((uchar)dataIn[3]*256) + (uchar)dataIn[4];
     pOut = ((uchar)dataIn[5]*256) + (uchar)dataIn[6];
     cOut = ((uchar)dataIn[7]*256) + (uchar)dataIn[8];
+    adOut = ((uchar)dataIn[9]*256) + (uchar)dataIn[10];
 }
+/*
+    函数功能:RDH解析
+*/
+void analysisRDH(QByteArray dataIn, int &tOut, int&pOut, int &cOut, int &nPpm, int &nUP, int &nOP)
+{
+    tOut = ((uchar)dataIn[3]*256) + (uchar)dataIn[4];
+    pOut = ((uchar)dataIn[5]*256) + (uchar)dataIn[6];
+    cOut = ((uchar)dataIn[7]*256) + (uchar)dataIn[8];
+    nPpm = ((uchar)dataIn[9]*256) + (uchar)dataIn[10];
+    nUP = ((uchar)dataIn[11]*256) + (uchar)dataIn[12];
+    nOP = ((uchar)dataIn[13]*256) + (uchar)dataIn[14];
 
+}
 /*
     函数功能:延时读取
 */
@@ -304,6 +319,7 @@ void MainWindow::comDelay()
 
 /*
     函数功能:串口读数据
+    暂时废弃
 */
 void MainWindow::readData()
 {
@@ -313,7 +329,7 @@ void MainWindow::readData()
 
     for (int i = 0; i < m_pComlist->size(); i++)
     {
-        int tOut = -1, hOut = -1, pOut = -1, cOut = -1;
+        int tOut = -1, hOut = -1, pOut = -1, cOut = -1, adOut = -1;
         QSerialPort *serial = m_pComlist->at(i).m_serial;
         SerialPortInfo *serialPortInfo = &m_pComlist->operator[](i);
         qDebug()<<"bytes:"<<serial->bytesAvailable();
@@ -396,7 +412,7 @@ void MainWindow::readData()
                 }
                 else if(serialPortInfo->m_nDeviceType == HM100PR)
                 {
-                    analysisHM100PR(data, tOut, pOut, cOut);
+                    analysisHM100PR(data, tOut, pOut, cOut, adOut);
                     if (j < serialPortInfo->m_pDeviceList->size() - 1)
                     {
                         ui->textEditPrint->append(serial->portName() + "(" + QString::number((uchar)info.m_abyAddr[1]) + ")温度:" + QString::number((double)tOut/100)
@@ -427,6 +443,8 @@ void MainWindow::readData()
                 }
                 /* 温湿度数据插入数据库后，发送信号更新表盘 */
                 emit sendRtData(obj, deviceSbInfo);
+
+
             }
         }
         /* 读到的是设备地址 */
@@ -486,7 +504,7 @@ void readData2(QSerialPort *serial)
 void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
 {
 
-    int tOut = -1, hOut = -1, pOut = -1, cOut = -1;
+    int tOut = -1, hOut = -1, pOut = -1, cOut = -1, adOut = -1, nPpm = -1, nOP = -1, nUP = -1;
     QSerialPort *serial = m_pComlist->at(deviceSbInfo.nComIndex).m_serial;
     SerialPortInfo *serialPortInfo = &m_pComlist->operator[](deviceSbInfo.nComIndex);
     DeviceInfo *pCurInfo = &serialPortInfo->m_pDeviceList->operator[](deviceSbInfo.nDeviceIndex);
@@ -511,32 +529,53 @@ void MainWindow::readDeviceData(DeviceSymbolInfo deviceSbInfo)
         }
         return;
     }
-
-
-    analysisHM100PR(data, tOut, pOut, cOut);
-
-    ui->textEditPrint->append(QString("%1(%2)温度(℃):%3压力(MPa):%4密度(MPa):%5").arg(serial->portName()).arg((uchar)pCurInfo->m_abyAddr[1]).arg((float)tOut/100).arg((float)pOut/10000).arg((float)cOut/10000));
-    ui->lineEdit_time->setText(QString("%1时间:%2").arg(serial->portName()).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
     QJsonObject obj;
-    obj.insert("温度", tOut);
-    obj.insert("压力", pOut);
-    obj.insert("密度", cOut);
-    obj.insert("地址", (uchar)pCurInfo->m_abyAddr[1]);
-
-    /* 插入数据库 */
-    if(!m_sqlQuery.exec(QString("INSERT INTO TH015A VALUES('%1', '%2', '%3', '%4', '%5')").
-                        arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.z")).
-                        arg((float)pOut/10000).arg((float)cOut/10000).arg((float)tOut/100).arg((uchar)pCurInfo->m_abyAddr[1])))
+    /* RDH和DMJ分类 */
+    if (deviceSbInfo.nDeviceType == HM100PR)
     {
+        analysisHM100PR(data, tOut, pOut, cOut, adOut);
 
-        qDebug() << m_sqlQuery.lastError();
+        ui->textEditPrint->append(QString("%1(%2)温度(℃):%3压力(MPa):%4密度(MPa):%5AD值:%6").arg(serial->portName()).arg((uchar)pCurInfo->m_abyAddr[1]).arg((float)tOut/100).arg((float)pOut/10000).arg((float)cOut/10000).arg((float)adOut));
+        ui->lineEdit_time->setText(QString("%1时间:%2").arg(serial->portName()).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
+
+        obj.insert("温度", tOut);
+        obj.insert("压力", pOut);
+        obj.insert("密度", cOut);
+        obj.insert("地址", (uchar)pCurInfo->m_abyAddr[1]);
+        obj.insert("AD", adOut);
+
+        /* 插入数据库 */
+        if(!m_sqlQuery.exec(QString("INSERT INTO TH015AD VALUES('%1', '%2', '%3', '%4', '%5', '%6')").
+                            arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.z")).
+                            arg((float)pOut/10000).arg((float)cOut/10000).arg((float)tOut/100).arg((float)adOut).arg((uchar)pCurInfo->m_abyAddr[1])))
+        {
+
+            qDebug() << m_sqlQuery.lastError();
+        }
+        else
+        {
+            qDebug() << "inserted value 015,25,25!";
+        }
     }
-    else
+    else if(deviceSbInfo.nDeviceType == RDH)
     {
-        qDebug() << "inserted value 015,25,25!";
+        analysisRDH(data, tOut, pOut, cOut, nPpm, nUP, nOP);
+
+        ui->textEditPrint->append(QString("%1(%2)温度(℃):%3压力(MPa):%4密度(MPa):%5Ppm:%6").arg(serial->portName()).arg((uchar)pCurInfo->m_abyAddr[1]).arg((float)tOut/100).arg((float)pOut/10000).arg((float)cOut/10000).arg((float)nPpm));
+        ui->lineEdit_time->setText(QString("%1时间:%2").arg(serial->portName()).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss")));
+        obj.insert("温度", tOut);
+        obj.insert("压力", pOut);
+        obj.insert("密度", cOut);
+        obj.insert("地址", (uchar)pCurInfo->m_abyAddr[1]);
+        obj.insert("Ppm", nPpm);
+        obj.insert("带压露点", nUP);
+        obj.insert("常压露点", nOP);
     }
+
     /* 温湿度数据插入数据库后，发送信号更新表盘 */
     emit sendRtData(&obj, deviceSbInfo);
+    /* 更新EP展界面 */
+    emit sigSendMainEp(&obj, deviceSbInfo);
 
     QTimer::singleShot(0, this, [=](){SendMsgFunc(deviceSbInfo.nDeviceIndex+1);});
 
@@ -586,6 +625,8 @@ void MainWindow::SendMsgFunc(int nIndex)
         {
             DeviceInfo deviceInfo = portInfo.m_pDeviceList->operator[](nIndex);
             deviceSbInfo.nAddress = deviceInfo.m_abyAddr[1];
+            deviceSbInfo.nDMJType = deviceInfo.m_nDMJType;
+            deviceSbInfo.nDeviceType = deviceInfo.m_nDeviceType;
             switch(deviceInfo.m_nDeviceType)
             {
                 case THC:
@@ -596,8 +637,16 @@ void MainWindow::SendMsgFunc(int nIndex)
                 }
                 case HM100PR:
                 {
-                    uchar td[8] = HM_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 3);
+                    uchar td[8] = HM_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 4);
                     memcpy(d, td, 6);
+                    break;
+                }
+                case RDH:
+                {
+
+                    uchar td[8] = RDH_CHK_DATA((uchar)deviceInfo.m_abyAddr[1], 6);
+                    memcpy(d, td, 6);
+                    qDebug()<<"RDH"<<d;
                     break;
                 }
 
@@ -912,5 +961,20 @@ void MainWindow::on_pushButtonSheet_historyAnalysis_clicked()
     }
 
     m_historyAnalysisForm->show();
+
+}
+
+/*
+    函数功能：打开电子展屏
+*/
+void MainWindow::on_pushButton_eDisplayBoard_clicked()
+{
+    if (m_eDispalyBoardForm == nullptr)
+    {
+        m_eDispalyBoardForm = new EDispalyBoardForm;
+        connect(this, SIGNAL(sigSendMainEp(QJsonObject *, DeviceSymbolInfo)), m_eDispalyBoardForm, SLOT(slotRcvMainEp(QJsonObject *, DeviceSymbolInfo)));
+    }
+    qDebug()<<"打开子界面";
+    m_eDispalyBoardForm->show();
 
 }

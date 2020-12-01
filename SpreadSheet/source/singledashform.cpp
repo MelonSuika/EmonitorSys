@@ -32,11 +32,13 @@ void SingleDashForm::setDashData(QJsonObject *data)
     int p = data->value("压力").toInt();
     int c = data->value("密度").toInt();
     int a = data->value("地址").toInt();
+    float ad = data->value("AD").toInt();
 
     ui->lineEdit_address->setText(QString::number(data->value("地址").toInt()));
     ui->lineEdit_temperature->setText(QString::asprintf("%.2f", (float)t/100));
-    ui->lineEdit_pressure->setText(QString::asprintf("%.3f", (float)p/10000 - 0.1));
-    ui->lineEdit_density->setText(QString::asprintf("%.3f", (float)c/10000 - 0.1));
+    ui->lineEdit_pressure->setText(QString::asprintf("%.4f", (float)p/10000 - 0.1));
+    ui->lineEdit_density->setText(QString::asprintf("%.4f", (float)c/10000 - 0.1));
+    ui->lineEdit_extra->setText(QString::asprintf("%.3f", ad));
     if (c > 4500)
     {
         this->setStyleSheet(("background-color: rgb(255, 0, 0)"));

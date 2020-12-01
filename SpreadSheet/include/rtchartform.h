@@ -13,6 +13,24 @@ namespace Ui {
 class RtChartForm;
 }
 
+typedef struct DMJData
+{
+    int T;
+    int D;
+    int P;
+    int Ppm;
+}TDMJData;
+
+typedef struct RtChartData
+{
+    int nAddr;
+    int nDMJType;
+    int nType;
+    QMap<qint64, TDMJData> *pMapData;
+
+}TRtChartData;
+
+
 class RtChartForm : public QWidget
 {
     Q_OBJECT
@@ -34,6 +52,12 @@ private slots:
     void on_pushButton_allDisplay_clicked();
 
     void on_pushButton_pressure_clicked();
+
+    void on_pushButton_clear_clicked();
+
+    void on_comboBox_addrList_currentTextChanged(const QString &arg1);
+
+    void slotAddr2Arg(QString);
 
 private:
     int m_nMaxSize;
@@ -61,8 +85,15 @@ private:
     QStringList *m_strlistAlert;
     QStringListModel *m_strListModelAlert;
 
+    /*
+     * 曲线数据列表
+       ∵数据量并不大
+       ∴这边使用了vector
+    */
+    QVector<TRtChartData> *m_vctRTData;
+    int m_nCurAddr; /* 当前表地址 */
+
 protected:
-    //void resizeEvent(QResizeEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
 public slots:
